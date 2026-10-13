@@ -1,0 +1,25 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Release notes from CHANGELOG.md
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          awk -v v="$V" '$0 ~ "^## "v" " {f=1; next} /^## / && f {exit} f' CHANGELOG.md > notes.md
+          [ -s notes.md ] || echo "Версия $V" > notes.md
+          cp NCPK-emulator.apk "NCPK-emulator-$V.apk"
+          cp index.html "NCPK-emulator-$V.html"
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" "NCPK-emulator-$V.apk" "NCPK-emulator-$V.html" \
+            --title "Версия $V" --notes-file notes.md --latest

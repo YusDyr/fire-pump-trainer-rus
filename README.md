@@ -4,7 +4,9 @@
 
 **▶ Открыть в браузере:** https://yusdyr.github.io/fire-pump-trainer-rus/
 
-**📱 Приложение для Android:** [NCPK-emulator.apk](NCPK-emulator.apk) — работает без интернета.
+**📱 Приложение для Android:** [последняя версия](https://github.com/YusDyr/fire-pump-trainer-rus/releases/latest) · [NCPK-emulator.apk](NCPK-emulator.apk) — работает без интернета.
+
+**📋 Что нового:** [CHANGELOG.md](CHANGELOG.md) · [все версии](https://github.com/YusDyr/fire-pump-trainer-rus/releases)
 
 ## Что умеет
 - Насосный отсек по фотографиям машины: вентили, краны, дозатор, БУК-02, пульт АЦ — всё нажимается и крутится, манометры показывают реальные значения
