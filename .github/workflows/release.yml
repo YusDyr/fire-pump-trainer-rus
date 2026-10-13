@@ -1,7 +1,11 @@
 name: Release
+# Новый релиз создаётся автоматически, когда в main меняется файл VERSION.
+# Тег vX.Y, заметки из раздела «## X.Y» в CHANGELOG.md, к релизу прикладываются APK и HTML.
 on:
   push:
-    tags: ['v*']
+    branches: [main]
+    paths: ['VERSION']
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
@@ -9,9 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Release notes from CHANGELOG.md
+      - name: Prepare
+        id: prep
         run: |
-          V="${GITHUB_REF_NAME#v}"
+          V="$(tr -d ' \n\r' < VERSION)"
+          echo "v=$V" >> "$GITHUB_OUTPUT"
           awk -v v="$V" '$0 ~ "^## "v" " {f=1; next} /^## / && f {exit} f' CHANGELOG.md > notes.md
           [ -s notes.md ] || echo "Версия $V" > notes.md
           cp NCPK-emulator.apk "NCPK-emulator-$V.apk"
@@ -20,6 +26,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          V="${GITHUB_REF_NAME#v}"
-          gh release create "$GITHUB_REF_NAME" "NCPK-emulator-$V.apk" "NCPK-emulator-$V.html" \
-            --title "Версия $V" --notes-file notes.md --latest
+          V="${{ steps.prep.outputs.v }}"
+          if gh release view "v$V" >/dev/null 2>&1; then
+            gh release upload "v$V" "NCPK-emulator-$V.apk" "NCPK-emulator-$V.html" --clobber
+            gh release edit "v$V" --notes-file notes.md
+          else
+            gh release create "v$V" "NCPK-emulator-$V.apk" "NCPK-emulator-$V.html" \
+              --target "$GITHUB_SHA" --title "Версия $V" --notes-file notes.md --latest
+          fi
