@@ -424,7 +424,7 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
     <div class="plate-id">АЦ<br>1,6-40/4</div>
     <div>
       <h1>Пульт НЦПК-40/100-4/400М</h1>
-      <p>Учебный эмулятор насосной установки · ГАЗон NEXT C41R33 · <a href="https://github.com/YusDyr/fire-pump-trainer-rus/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="Что нового">v3.5</a></p>
+      <p>Учебный эмулятор насосной установки · ГАЗон NEXT C41R33 · <a href="https://github.com/YusDyr/fire-pump-trainer-rus/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="Что нового">v3.6</a></p>
     </div>
   </div>
   <div class="toolbar">
@@ -510,7 +510,7 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
     </div>
     <div class="panel" id="pnlScene">
       <div class="scenehead"><h2>Насосный отсек</h2>
-        <button class="btn" id="loupeT" aria-pressed="true" title="Выноска-лупа для манометра воздуха">🔍 Лупа</button><button class="btn" id="cuT" aria-pressed="false" title="Крупный план: нажмите на элемент, чтобы увидеть его фотографию и другие ракурсы. Без режима — правая кнопка мыши или долгое нажатие">📷 Крупно</button><div class="seg" role="group" aria-label="Вид отсека" id="scModeSeg"><button data-scm="photo" aria-pressed="true">Фото</button><button data-scm="draw" aria-pressed="false">Рисунок</button></div><div class="seg" role="group" aria-label="Масштаб" id="zoomSeg"><button data-zoom="fit" aria-pressed="true">Весь отсек</button><button data-zoom="out" aria-pressed="false" aria-label="Уменьшить">−</button><button data-zoom="in" aria-pressed="false" aria-label="Увеличить">+</button></div></div>
+        <button class="btn" id="loupeT" aria-pressed="true" title="Показать или скрыть увеличенную выноску манометра воздуха на фото">🔍 Выноска манометра</button><button class="btn" id="cuT" aria-pressed="false" title="Крупный план: нажмите на элемент, чтобы увидеть его фотографию и другие ракурсы. Без режима — правая кнопка мыши или долгое нажатие">📷 Крупно</button><div class="seg" role="group" aria-label="Вид отсека" id="scModeSeg"><button data-scm="photo" aria-pressed="true">Фото</button><button data-scm="draw" aria-pressed="false">Рисунок</button></div><div class="seg" role="group" aria-label="Масштаб" id="zoomSeg"><button data-zoom="fit" aria-pressed="true">Весь отсек</button><button data-zoom="out" aria-pressed="false" aria-label="Уменьшить">−</button><button data-zoom="in" aria-pressed="false" aria-label="Увеличить">+</button></div></div>
       <p class="sub" style="margin:0 0 8px">Маховики и дозатор — ведите пальцем по кругу, крутите двумя пальцами или колёсиком мыши; при вращении видно, на сколько оборотов открыт вентиль. Рычаги и кнопки — нажатие. Масштаб — щипком (на компьютере Ctrl + колесо), двойное касание — приблизить или вернуть; приближенный отсек двигается пальцем.</p>
       <div class="scenewrap"><div class="zbadge" id="zBadge">×1</div><div class="sbadge" id="seasonBadge"></div><svg id="scene" viewBox="0 0 1000 760" role="img" aria-label="Насосный отсек АЦ: насос НЦПК, блок управления АВС, пульт АЦ"></svg></div>
       <div class="scenetip" id="sceneTip">Наведите на орган управления, чтобы увидеть его назначение.</div>
@@ -2853,9 +2853,11 @@ function rotDrag(el,center,onDelta){
 }
 // ===== Масштаб отсека щипком/колесом и жесты вращения (один палец по кругу, два пальца — поворот)
 const ZM={z:1,tx:0,ty:0};
+// размер и положение схемы без учёта масштаба (у SVG нет offsetLeft/clientWidth в Firefox)
+function svLayout(){const w=$('.scenewrap'),sv=$('#scene');if(!w||!sv)return {x:0,y:0,w:1,h:1};const t=sv.style.transform;sv.style.transform='none';const r=w.getBoundingClientRect(),q=sv.getBoundingClientRect();sv.style.transform=t;ZM.box={x:q.left-r.left,y:q.top-r.top,w:q.width||w.clientWidth,h:q.height||w.clientWidth*SC.vbH/SC.vbW};return ZM.box}
 function zApply(){
   const w=$('.scenewrap'),sv=$('#scene');if(!w||!sv)return;
-  const W=sv.clientWidth||w.clientWidth,H=sv.clientHeight||W*SC.vbH/SC.vbW;
+  const Bx=ZM.box||svLayout(),W=Bx.w,H=Bx.h;
   ZM.z=clamp(ZM.z,1,4);ZM.tx=clamp(ZM.tx,W-W*ZM.z,0);ZM.ty=clamp(ZM.ty,H-H*ZM.z,0);
   if(ZM.z<1.01){ZM.z=1;ZM.tx=0;ZM.ty=0}
   sv.style.transform=ZM.z===1?'':`translate(${ZM.tx}px,${ZM.ty}px) scale(${ZM.z})`;
@@ -2866,17 +2868,18 @@ function zApply(){
 function zoomAt(z,cx,cy){ // cx,cy — точка в координатах обёртки, остаётся на месте
   const ux=(cx-ZM.tx)/ZM.z,uy=(cy-ZM.ty)/ZM.z;ZM.z=clamp(z,1,4);ZM.tx=cx-ux*ZM.z;ZM.ty=cy-uy*ZM.z;zApply();
 }
-function setZoom(z){const sv=$('#scene');const cx=sv.clientWidth/2,cy=sv.clientHeight/2;
+function setZoom(z){const Bx=svLayout();const cx=Bx.w/2,cy=Bx.h/2;
   if(z==='fit'){ZM.z=1;zApply()}else if(z==='in')zoomAt(ZM.z*1.5,cx,cy);else if(z==='out')zoomAt(ZM.z/1.5,cx,cy);else if(z==='big')zoomAt(2,cx,cy)}
 function bindGestures(){
   const w=$('.scenewrap'),sv=$('#scene');const P=new Map();let G=null,lastTap=0;
-  const rel=e=>{const r=w.getBoundingClientRect();return {x:e.clientX-r.left-sv.offsetLeft,y:e.clientY-r.top-sv.offsetTop}};
+  const rel=e=>{const r=w.getBoundingClientRect(),Bx=ZM.box||svLayout();return {x:e.clientX-r.left-Bx.x,y:e.clientY-r.top-Bx.y}};
   const cScr=c=>{const r=sv.getBoundingClientRect(),k=r.width/SC.vbW;return {x:r.left+c.x*k,y:r.top+c.y*k}};
   const angC=(p,c)=>Math.atan2(p.y-c.y,p.x-c.x)*180/Math.PI;
   const two=()=>{const [a,b]=[...P.values()];return {a,b,d:Math.hypot(b.x-a.x,b.y-a.y),ang:Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI,m:{x:(a.x+b.x)/2,y:(a.y+b.y)/2}}};
   const wrapD=d=>d>180?d-360:d<-180?d+360:d;
   w.addEventListener('pointerdown',e=>{
     if(e.pointerType==='mouse'&&e.button!==0)return;
+    if(P.size===0)svLayout();
     P.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(P.size===1){
       const ctl=e.target.closest&&e.target.closest('[data-rot]');
@@ -2889,14 +2892,14 @@ function bindGestures(){
     }else if(P.size===2&&G){
       const t=two();
       if(G.mode==='rot'||G.mode==='twist'){G={mode:'twist',ctl:G.ctl,R:G.R,last:t.ang};}
-      else if(G.mode==='pan'){const r=w.getBoundingClientRect();G={mode:'pinch',d0:t.d||1,z0:ZM.z,m0:{x:t.m.x-r.left-sv.offsetLeft,y:t.m.y-r.top-sv.offsetTop},tx0:ZM.tx,ty0:ZM.ty};e.preventDefault();try{w.setPointerCapture(e.pointerId)}catch(_){}}
+      else if(G.mode==='pan'){const r=w.getBoundingClientRect();const Bx=ZM.box||svLayout();G={mode:'pinch',d0:t.d||1,z0:ZM.z,m0:{x:t.m.x-r.left-Bx.x,y:t.m.y-r.top-Bx.y},tx0:ZM.tx,ty0:ZM.ty};e.preventDefault();try{w.setPointerCapture(e.pointerId)}catch(_){}}
     }
   },{capture:true});
   const move=e=>{
     if(!P.has(e.pointerId)||!G)return;P.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(G.mode==='rot'&&e.pointerId===G.id){const c=cScr(G.R.center());if(Math.hypot(e.clientX-c.x,e.clientY-c.y)<10)return;const a=angC({x:e.clientX,y:e.clientY},c);const d=wrapD(a-G.last);G.last=a;G.R.onDelta(d);auTickAcc(d);vindShow(G.ctl.id)}
     else if(G.mode==='twist'&&P.size>=2){const t=two();const d=wrapD(t.ang-G.last);G.last=t.ang;G.R.onDelta(d);auTickAcc(d);vindShow(G.ctl.id)}
-    else if(G.mode==='pinch'&&P.size>=2){const t=two(),r=w.getBoundingClientRect();const z=clamp(G.z0*t.d/G.d0,1,4);const ux=(G.m0.x-G.tx0)/G.z0,uy=(G.m0.y-G.ty0)/G.z0;ZM.z=z;ZM.tx=(t.m.x-r.left-sv.offsetLeft)-ux*z;ZM.ty=(t.m.y-r.top-sv.offsetTop)-uy*z;zApply()}
+    else if(G.mode==='pinch'&&P.size>=2){const t=two(),r=w.getBoundingClientRect();const z=clamp(G.z0*t.d/G.d0,1,4);const ux=(G.m0.x-G.tx0)/G.z0,uy=(G.m0.y-G.ty0)/G.z0;ZM.z=z;ZM.tx=(t.m.x-r.left-(ZM.box?ZM.box.x:0))-ux*z;ZM.ty=(t.m.y-r.top-(ZM.box?ZM.box.y:0))-uy*z;zApply()}
     else if(G.mode==='pan'&&e.pointerId===G.id){const dx=e.clientX-G.lx,dy=e.clientY-G.ly;G.lx=e.clientX;G.ly=e.clientY;const ty0=ZM.ty;if(ZM.z>1){ZM.tx+=dx;ZM.ty+=dy;zApply()}const rest=dy-(ZM.ty-ty0);if(G.touch&&Math.abs(rest)>0.5)window.scrollBy(0,-rest)}
   };
   w.addEventListener('pointermove',move);
@@ -2907,8 +2910,8 @@ function bindGestures(){
     if(P.size===0){if(G.ctl)vindHide();G=null}
   };
   ['pointerup','pointercancel'].forEach(ev=>w.addEventListener(ev,up));
-  w.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();const q=rel(e);zoomAt(ZM.z*Math.exp(-e.deltaY*0.01),q.x,q.y)},{passive:false});
-  window.addEventListener('resize',()=>zApply());
+  w.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();svLayout();const q=rel(e);zoomAt(ZM.z*Math.exp(-e.deltaY*0.01),q.x,q.y)},{passive:false});
+  window.addEventListener('resize',()=>{svLayout();zApply()});
 }
 // ===== Индикатор положения при вращении
 const VTURNS=3;
@@ -3274,9 +3277,9 @@ fresh('tank');setView(v0);
 restoreState();
 let sPref=true;try{sPref=localStorage.getItem('ncpk-sound')!=='0'}catch(e){}
 document.addEventListener('pointerdown',()=>{try{auInit()}catch(e){}},{once:true,capture:true});
-if(sPref){$('#sound').textContent='🔈 Звук включится при первом нажатии';press($('#sound'),true);
-  const first=e=>{if(e.target.closest&&e.target.closest('#sound'))return;if(!AU.on)setSound(true)};
-  document.addEventListener('pointerdown',first,{once:true,capture:true});document.addEventListener('keydown',first,{once:true,capture:true})}
+if(sPref){$('#sound').textContent='🔊 Звук вкл.';$('#sound').title='Звук включится при первом нажатии на странице (так требует браузер)';press($('#sound'),true);
+  const first=e=>{if(e.target.closest&&e.target.closest('#sound'))return;if(!AU.on)setTimeout(()=>setSound(true),0)};
+  document.addEventListener('click',first,{once:true,capture:true});document.addEventListener('keydown',first,{once:true,capture:true})}
 let saveTick=0;
 setInterval(()=>{
   if(BG)return;
