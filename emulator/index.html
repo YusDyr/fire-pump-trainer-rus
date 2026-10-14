@@ -424,7 +424,7 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
     <div class="plate-id">АЦ<br>1,6-40/4</div>
     <div>
       <h1>Пульт НЦПК-40/100-4/400М</h1>
-      <p>Учебный эмулятор насосной установки · ГАЗон NEXT C41R33 · <a href="https://github.com/YusDyr/fire-pump-trainer-rus/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="Что нового">v3.6</a></p>
+      <p>Учебный эмулятор насосной установки · ГАЗон NEXT C41R33 · <a href="https://github.com/YusDyr/fire-pump-trainer-rus/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="Что нового">v3.7</a></p>
     </div>
   </div>
   <div class="toolbar">
@@ -510,7 +510,7 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
     </div>
     <div class="panel" id="pnlScene">
       <div class="scenehead"><h2>Насосный отсек</h2>
-        <button class="btn" id="loupeT" aria-pressed="true" title="Показать или скрыть увеличенную выноску манометра воздуха на фото">🔍 Выноска манометра</button><button class="btn" id="cuT" aria-pressed="false" title="Крупный план: нажмите на элемент, чтобы увидеть его фотографию и другие ракурсы. Без режима — правая кнопка мыши или долгое нажатие">📷 Крупно</button><div class="seg" role="group" aria-label="Вид отсека" id="scModeSeg"><button data-scm="photo" aria-pressed="true">Фото</button><button data-scm="draw" aria-pressed="false">Рисунок</button></div><div class="seg" role="group" aria-label="Масштаб" id="zoomSeg"><button data-zoom="fit" aria-pressed="true">Весь отсек</button><button data-zoom="out" aria-pressed="false" aria-label="Уменьшить">−</button><button data-zoom="in" aria-pressed="false" aria-label="Увеличить">+</button></div></div>
+        <button class="btn" id="cuT" aria-pressed="false" title="Крупный план: нажмите на элемент, чтобы увидеть его фотографию и другие ракурсы. Без режима — правая кнопка мыши или долгое нажатие">📷 Крупно</button><div class="seg" role="group" aria-label="Вид отсека" id="scModeSeg"><button data-scm="photo" aria-pressed="true">Фото</button><button data-scm="draw" aria-pressed="false">Рисунок</button></div><div class="seg" role="group" aria-label="Масштаб" id="zoomSeg"><button data-zoom="fit" aria-pressed="true">Весь отсек</button><button data-zoom="out" aria-pressed="false" aria-label="Уменьшить">−</button><button data-zoom="in" aria-pressed="false" aria-label="Увеличить">+</button></div></div>
       <p class="sub" style="margin:0 0 8px">Маховики и дозатор — ведите пальцем по кругу, крутите двумя пальцами или колёсиком мыши; при вращении видно, на сколько оборотов открыт вентиль. Рычаги и кнопки — нажатие. Масштаб — щипком (на компьютере Ctrl + колесо), двойное касание — приблизить или вернуть; приближенный отсек двигается пальцем.</p>
       <div class="scenewrap"><div class="zbadge" id="zBadge">×1</div><div class="sbadge" id="seasonBadge"></div><svg id="scene" viewBox="0 0 1000 760" role="img" aria-label="Насосный отсек АЦ: насос НЦПК, блок управления АВС, пульт АЦ"></svg></div>
       <div class="scenetip" id="sceneTip">Наведите на орган управления, чтобы увидеть его назначение.</div>
@@ -2475,6 +2475,7 @@ function buildScenePhoto(){SC.wf_sc_w0=SC.wf_sc_w1=undefined;
     <filter id="glow" x="-2" y="-2" width="5" height="5"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     <filter id="glow7" x="-.2" y="-.6" width="1.4" height="2.2"><feGaussianBlur stdDeviation="0.9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     <clipPath id="cpPult"><rect x="444" y="164" width="645" height="472" rx="12"/></clipPath>
+    <clipPath id="cpGhps"><path d="M1520 1034.8 L1525 1048.7 L1530 1058.0 L1535 1065.3 L1540 1071.3 L1545 1076.4 L1550 1080.7 L1555 1084.4 L1560 1087.6 L1565 1090.4 L1570 1092.7 L1575 1094.7 L1575 1094.7 L1575 1170 L1520 1170 Z"/></clipPath>
     <clipPath id="cpBuk"><rect x="824" y="974" width="413" height="294" rx="12"/></clipPath>
     <clipPath id="cpDoz"><circle cx="880" cy="1422" r="110"/></clipPath>
     <clipPath id="cpGin"><path d="M1250 1700 L1450 1648 L1460 1800 L1250 1800 Z"/></clipPath>
@@ -2497,8 +2498,7 @@ function buildScenePhoto(){SC.wf_sc_w0=SC.wf_sc_w1=undefined;
    h+=`<path d="M${pt(66,157)} L${pt(94,157)} L${pt(94,170)} L${pt(66,170)} Z" fill="#dfe2e2"/>`}
   const gs=(id,cx,cy,r,clip)=>`<g ${clip?`id="${id}_wrap" clip-path="url(#${clip})"`:''}><svg id="${id}" x="${cx-r}" y="${cy-r}" width="${2*r}" height="${2*r}" viewBox="0 0 160 160"></svg></g>`;
   h+=gs('sc_gOut',1605,1011,80)+gs('sc_gIn',1358,1713,81,'cpGin')+gs('sc_gHp',626,1665,80);
-  h+=`<g id="ph_loupe" style="display:${SC.loupe?'':'none'}"><circle cx="1548" cy="1122" r="24" fill="none" stroke="#ffd25e" stroke-width="3" stroke-dasharray="6 4"/><path d="M1526 1116 L1462 1100" stroke="#ffd25e" stroke-width="3"/>
-    <circle cx="1410" cy="1092" r="56" fill="#22272b" stroke="#ffd25e" stroke-width="4"/>`+gs('sc_gHps',1410,1092,52)+`<text x="1410" y="1168" text-anchor="middle" font-size="18" font-weight="700" fill="#fff" stroke="#000" stroke-width="3" paint-order="stroke">манометр воздуха ×4</text></g>`;
+  h+=gs('sc_gHps',1564,1120,34,'cpGhps');
   const lever=(id,o,col='#d8231f')=>`<g id="${id}" style="display:none"><g id="${id}_r"><rect x="${o.x-o.len}" y="${o.y-o.w/2}" width="${o.len}" height="${o.w}" rx="${o.w/2}" fill="${col}" stroke="#7f0f12" stroke-width="2.5"/></g><circle cx="${o.x}" cy="${o.y}" r="${o.w*0.7}" fill="#c9ced1" stroke="#6d767b" stroke-width="2"/></g>`;
   h+=`<path id="ph_dozTab" d="" fill="#d8231f" stroke="#8c1015" stroke-width="1.5" pointer-events="none"/>`;
   const hp=P.hp;
@@ -2538,7 +2538,7 @@ function buildScenePhoto(){SC.wf_sc_w0=SC.wf_sc_w1=undefined;
   h+=hit('sc_doz','Дозатор «Подача насоса»: ведите по кругу (против часовой — больше). Указатель — красный выступ на краю маховичка. Наружная шкала — 6 %, внутренняя — 3 %, л/с подачи раствора',ringC(880,1422,112));
   const ind=(id,name,shape)=>`<g class="ind" id="${id}" data-name="${name}" data-tip="${name}">${shape}</g>`;
   const gh=(id,name,x,y,r)=>hit(id,name+': нажмите, чтобы увидеть крупно',`<circle class="ring" cx="${x}" cy="${y}" r="${r}" fill="transparent" stroke="transparent"/>`).replace('class="hit"',`class="hit" data-name="${name}"`);
-  h+=`<g style="display:${SC.loupe?'':'none'}">`+gh('gz_hps','Манометр воздуха (магистраль продувки)',1410,1092,58)+gh('gz_hps2','Манометр воздуха (магистраль продувки)',1548,1122,26)+`</g>`;
+  h+=gh('gz_hps2','Манометр воздуха (магистраль продувки)',1562,1122,34);
   h+=gh('gz_out','Манометр нормального давления',1604.8,1007.8,86)+gh('gz_in','Мановакуумметр',1356.8,1735,70)+gh('gz_hp','Манометр высокого давления',625,1661,80);
   h+=ind('li_lw','Уровень воды в цистерне (светодиоды)',`<rect x="560" y="270" width="45" height="312" fill="transparent"/>`)+ind('li_lf','Уровень пенообразователя (светодиоды)',`<rect x="682" y="272" width="45" height="310" fill="transparent"/>`);
   h+=ind('li_al','Аварийное состояние двигателя',`<circle cx="894" cy="266" r="20" fill="transparent"/>`)+ind('li_air','Аварийное давление воздуха',`<circle cx="1013" cy="269" r="20" fill="transparent"/>`)+ind('li_can','Управление оборотами (индикатор)',`<circle cx="852" cy="450" r="20" fill="transparent"/>`);
@@ -3258,7 +3258,7 @@ syncTb();
 })();
 $$('#zoomSeg button').forEach(b=>b.onclick=()=>setZoom(b.dataset.zoom));
 $$('#scModeSeg button').forEach(b=>b.onclick=()=>setSceneMode(b.dataset.scm));
-$('#loupeT').onclick=()=>{SC.loupe=!SC.loupe;try{localStorage.setItem('ncpk-loupe',SC.loupe?'1':'0')}catch(e){}press($('#loupeT'),SC.loupe);buildScene();renderScene()};press($('#loupeT'),SC.loupe);
+
 $('#tbResult').addEventListener('fin',()=>showFinish(false));
 $('#tbMini').onclick=()=>{const m=!$('#taskbar').classList.contains('mini');$('#taskbar').classList.toggle('mini',m);$('#tbMini').textContent=m?'Развернуть':'Свернуть';press($('#tbMini'),m);try{localStorage.setItem('ncpk-mini',m?'1':'0')}catch(e){}};
 {let m=null;try{m=localStorage.getItem('ncpk-mini')}catch(e){}if(m==='1'||(m===null&&innerWidth<760))$('#tbMini').click()}
