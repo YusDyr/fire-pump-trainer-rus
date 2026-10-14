@@ -2,7 +2,7 @@
 
 Учебный эмулятор насосной установки автоцистерны **АЦ 1,6-40/4 на шасси ГАЗон NEXT (C41R33)**, ДПК «Экстремум».
 
-**▶ Открыть в браузере:** https://yusdyr.github.io/fire-pump-trainer-rus/
+**▶ Сайт:** https://yusdyr.github.io/fire-pump-trainer-rus/ · **эмулятор сразу:** https://yusdyr.github.io/fire-pump-trainer-rus/emulator/
 
 **📱 Приложение для Android:** [последняя версия](https://github.com/YusDyr/fire-pump-trainer-rus/releases/latest) · [NCPK-emulator.apk](NCPK-emulator.apk) — работает без интернета.
 

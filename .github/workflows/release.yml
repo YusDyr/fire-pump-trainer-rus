@@ -21,7 +21,7 @@ jobs:
           awk -v v="$V" '$0 ~ "^## "v" " {f=1; next} /^## / && f {exit} f' CHANGELOG.md > notes.md
           [ -s notes.md ] || echo "Версия $V" > notes.md
           cp NCPK-emulator.apk "NCPK-emulator-$V.apk"
-          cp index.html "NCPK-emulator-$V.html"
+          cp emulator/index.html "NCPK-emulator-$V.html"
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
