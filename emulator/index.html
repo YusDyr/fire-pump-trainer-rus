@@ -303,6 +303,7 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
   .taskbar .tb-side{flex-direction:row;align-items:center;gap:6px}.taskbar .tbscore>span{display:none}
   .taskbar .tb-side .btn,.taskbar .tb-side .toggle{padding:3px 8px;font-size:12px}
   .taskbar .tbalerts li:nth-child(n+2){display:none}
+  #pnlCab{padding:4px 8px}#pnlCab h2{display:none}#pnlCab .toggle,#pnlCab .seg button{padding:3px 8px;font-size:12px}
   #pnlScene{padding:6px 8px}#pnlScene .scenehead{margin-bottom:4px}#pnlScene .scenehead h2{font-size:12px}#pnlScene > p.sub,.scenetip{display:none}
   .scenewrap > svg{width:auto;max-width:100%;height:calc(100dvh - 60px)}
 }
@@ -317,7 +318,18 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
 .taskbar.mini .tbsteps li:not(.cur){display:none}
 .taskbar.mini .lwhy,.taskbar.mini .tb-side .row:first-of-type{display:none}
 .taskbar.mini .tbalerts li:nth-child(n+2){display:none}
- #hoverTip{position:fixed;z-index:40;pointer-events:none;max-width:320px;background:rgba(17,21,24,.94);color:#fff;border-radius:7px;padding:7px 10px;font-size:13px;line-height:1.35;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+ .cumodal{position:fixed;inset:0;z-index:70;background:rgba(8,10,12,.94);display:flex;flex-direction:column;color:#fff}
+.cumodal[hidden]{display:none!important}
+.cuhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px))}
+.cuhead .sub{color:#c9d1d6}.cuhead .row{display:flex;gap:6px}.cuhead .btn{background:#2a3035;color:#fff;border-color:#444}
+.cuview{position:relative;flex:1;overflow:hidden;touch-action:none;display:flex;align-items:center;justify-content:center;cursor:zoom-in}
+.cuview img{max-width:100%;max-height:100%;transform-origin:center center;user-select:none;-webkit-user-select:none;transition:opacity .2s}
+.cunav{position:absolute;top:50%;transform:translateY(-50%);left:8px;width:44px;height:64px;border-radius:8px;border:0;background:rgba(0,0,0,.45);color:#fff;font-size:34px;cursor:pointer}.cunav.r{left:auto;right:8px}
+.cuload{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:13px;color:#ccc}
+.cuthumbs{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+.cuth{flex:none;border:2px solid transparent;border-radius:6px;padding:0;background:none;cursor:pointer}.cuth.on{border-color:#ffd25e}.cuth img{display:block;height:64px;width:auto;border-radius:4px}
+#scene.cumode{cursor:zoom-in}#scene.cumode *{cursor:zoom-in!important}
+#hoverTip{position:fixed;z-index:40;pointer-events:none;max-width:320px;background:rgba(17,21,24,.94);color:#fff;border-radius:7px;padding:7px 10px;font-size:13px;line-height:1.35;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 #hoverTip b{display:block;font-weight:600}#hoverTip span{display:block;color:#ffd25e;font-family:var(--f-mono);font-size:12.5px;margin-top:2px}
 #scene .ind{cursor:pointer}#scene .ind.area{cursor:default}
 .gzwin{position:fixed;inset:0;z-index:45;pointer-events:none}
@@ -340,6 +352,7 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
 .pmodal{position:fixed;inset:0;z-index:50;background:rgba(10,15,20,.55);display:flex;align-items:center;justify-content:center;padding:16px}
 .pbox{background:var(--plate);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px 14px;max-width:1100px;width:100%;max-height:calc(100vh - 32px);overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.35)}
 .pnote{font-size:13px;color:var(--muted);margin:8px 0 0}
+#pnlCab{padding:8px 12px}#pnlCab h2{margin-bottom:6px}
 .scenetip{font-size:12.5px;color:var(--muted);margin-top:6px;min-height:1.4em}
 #scene .hit{cursor:pointer}
 #scene .hit:focus{outline:none}
@@ -350,7 +363,10 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
 .pipe{fill:none;stroke:var(--line);stroke-width:7;stroke-linecap:round}
 .schem .vbody{stroke:#1b2023;stroke-width:1.2;fill:#c42a1d}.schem .vbody.v1{fill:#1d9a52}.schem .vbody.vp{fill:#e0a300}.schem .vbody.v0{fill:#c42a1d}
 .schem .vlab{font-size:9px;fill:var(--muted)}.schem .vpct{font-size:9px;fill:var(--ink);font-weight:700}
-.flow.air{stroke:#9fb3c8;stroke-dasharray:3 6}.flow.foam{stroke:#e7a83a}
+.flow.air{stroke:#3fb8d8;stroke-dasharray:3 5}.flow.foam{stroke:#e7a83a}.flow.vac{stroke:#8b96a0;stroke-dasharray:2 4}.flow.sol{stroke:#9bbf2a}
+.schem .ctl{stroke:#3fb8d8;stroke-width:1.4;stroke-dasharray:6 3 1 3;opacity:.35}.schem .ctl.on{opacity:1}
+.schem .arr{fill:none;stroke:var(--muted);stroke-width:1.4;opacity:.7}
+.schem .solbody.on{fill:#ffe08a}
 .flow{fill:none;stroke:var(--water);stroke-width:3;stroke-dasharray:6 8;stroke-linecap:round}
 .flow.hp{stroke:var(--signal)}
 .flow.off{stroke:transparent}
@@ -408,7 +424,7 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
     <div class="plate-id">АЦ<br>1,6-40/4</div>
     <div>
       <h1>Пульт НЦПК-40/100-4/400М</h1>
-      <p>Учебный эмулятор насосной установки · ГАЗон NEXT C41R33 · <a href="https://github.com/YusDyr/fire-pump-trainer-rus/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="Что нового">v3.4</a></p>
+      <p>Учебный эмулятор насосной установки · ГАЗон NEXT C41R33 · <a href="https://github.com/YusDyr/fire-pump-trainer-rus/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="Что нового">v3.5</a></p>
     </div>
   </div>
   <div class="toolbar">
@@ -477,9 +493,24 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
 </div>
 
 <section class="scenerow">
+    <div class="panel" id="pnlCab">
+      <h2>Кабина водителя</h2>
+      <div class="cab">
+        
+        <button class="toggle red iconbtn" id="brake" aria-pressed="false" title="Стояночный тормоз" aria-label="Стояночный тормоз"><span class="led"></span><svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true"><circle cx="24" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M8.5 11.5a19 19 0 0 0 0 25M39.5 11.5a19 19 0 0 1 0 25" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/><text x="24" y="30.5" text-anchor="middle" font-size="17" font-weight="800" fill="currentColor" font-family="Arial,sans-serif">P</text></svg></button>
+        <button class="toggle amber iconbtn" id="kom" aria-pressed="false" title="Коробка отбора мощности (КОМ)" aria-label="КОМ"><span class="led"></span><svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true"><path d="M31.9 25.0 L35.7 25.9 L35.7 32.1 L31.9 33.0 L31.8 33.3 L34.3 36.4 L30.7 41.3 L27.1 39.8 L26.8 40.0 L27.1 44.0 L21.3 45.8 L19.2 42.5 L18.8 42.5 L16.7 45.8 L10.9 44.0 L11.2 40.0 L10.9 39.8 L7.3 41.3 L3.7 36.4 L6.2 33.3 L6.1 33.0 L2.3 32.1 L2.3 25.9 L6.1 25.0 L6.2 24.7 L3.7 21.6 L7.3 16.7 L10.9 18.2 L11.2 18.0 L10.9 14.0 L16.7 12.2 L18.8 15.5 L19.2 15.5 L21.3 12.2 L27.1 14.0 L26.8 18.0 L27.1 18.2 L30.7 16.7 L34.3 21.6 L31.8 24.7Z M28 29 a9 9 0 1 0 -18 0 a9 9 0 1 0 18 0Z" fill="currentColor" fill-rule="evenodd"/><circle cx="19" cy="29" r="5" fill="none" stroke="currentColor" stroke-width="3"/><path d="M43.3 10.1 L45.7 10.8 L45.7 15.2 L43.3 15.9 L43.2 16.1 L44.5 18.3 L41.3 21.5 L39.1 20.2 L38.9 20.3 L38.2 22.7 L33.8 22.7 L33.1 20.3 L32.9 20.2 L30.7 21.5 L27.5 18.3 L28.8 16.1 L28.7 15.9 L26.3 15.2 L26.3 10.8 L28.7 10.1 L28.8 9.9 L27.5 7.7 L30.7 4.5 L32.9 5.8 L33.1 5.7 L33.8 3.3 L38.2 3.3 L38.9 5.7 L39.1 5.8 L41.3 4.5 L44.5 7.7 L43.2 9.9Z M39.2 13 a3.2 3.2 0 1 0 -6.4 0 a3.2 3.2 0 1 0 6.4 0Z" fill="currentColor" fill-rule="evenodd"/></svg></button>
+        <span class="lbl">КПП</span>
+        <div class="seg" role="group" aria-label="Передача" id="gearSeg">
+          <button data-gear="N">N</button><button data-gear="1">1</button><button data-gear="5">5</button>
+        </div>
+        
+        <button class="toggle amber" id="heaterT" aria-pressed="false"><span class="led"></span>Отопитель насосного отсека</button>
+        <button class="toggle" id="capT" aria-pressed="false"><span class="led"></span>Крышка горловины цистерны открыта</button>
+      </div>
+    </div>
     <div class="panel" id="pnlScene">
       <div class="scenehead"><h2>Насосный отсек</h2>
-        <button class="btn" id="loupeT" aria-pressed="true" title="Выноска-лупа для манометра воздуха">🔍 Лупа</button><div class="seg" role="group" aria-label="Вид отсека" id="scModeSeg"><button data-scm="photo" aria-pressed="true">Фото</button><button data-scm="draw" aria-pressed="false">Рисунок</button></div><div class="seg" role="group" aria-label="Масштаб" id="zoomSeg"><button data-zoom="fit" aria-pressed="true">Весь отсек</button><button data-zoom="out" aria-pressed="false" aria-label="Уменьшить">−</button><button data-zoom="in" aria-pressed="false" aria-label="Увеличить">+</button></div></div>
+        <button class="btn" id="loupeT" aria-pressed="true" title="Выноска-лупа для манометра воздуха">🔍 Лупа</button><button class="btn" id="cuT" aria-pressed="false" title="Крупный план: нажмите на элемент, чтобы увидеть его фотографию и другие ракурсы. Без режима — правая кнопка мыши или долгое нажатие">📷 Крупно</button><div class="seg" role="group" aria-label="Вид отсека" id="scModeSeg"><button data-scm="photo" aria-pressed="true">Фото</button><button data-scm="draw" aria-pressed="false">Рисунок</button></div><div class="seg" role="group" aria-label="Масштаб" id="zoomSeg"><button data-zoom="fit" aria-pressed="true">Весь отсек</button><button data-zoom="out" aria-pressed="false" aria-label="Уменьшить">−</button><button data-zoom="in" aria-pressed="false" aria-label="Увеличить">+</button></div></div>
       <p class="sub" style="margin:0 0 8px">Маховики и дозатор — ведите пальцем по кругу, крутите двумя пальцами или колёсиком мыши; при вращении видно, на сколько оборотов открыт вентиль. Рычаги и кнопки — нажатие. Масштаб — щипком (на компьютере Ctrl + колесо), двойное касание — приблизить или вернуть; приближенный отсек двигается пальцем.</p>
       <div class="scenewrap"><div class="zbadge" id="zBadge">×1</div><div class="sbadge" id="seasonBadge"></div><svg id="scene" viewBox="0 0 1000 760" role="img" aria-label="Насосный отсек АЦ: насос НЦПК, блок управления АВС, пульт АЦ"></svg></div>
       <div class="scenetip" id="sceneTip">Наведите на орган управления, чтобы увидеть его назначение.</div>
@@ -553,22 +584,6 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
 
   <!-- ЦЕНТР: кабина и пульт -->
   <section class="col col-mid">
-    <div class="panel">
-      <h2>Кабина водителя</h2>
-      <div class="cab">
-        
-        <button class="toggle red iconbtn" id="brake" aria-pressed="false" title="Стояночный тормоз" aria-label="Стояночный тормоз"><span class="led"></span><svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true"><circle cx="24" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M8.5 11.5a19 19 0 0 0 0 25M39.5 11.5a19 19 0 0 1 0 25" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/><text x="24" y="30.5" text-anchor="middle" font-size="17" font-weight="800" fill="currentColor" font-family="Arial,sans-serif">P</text></svg></button>
-        <button class="toggle amber iconbtn" id="kom" aria-pressed="false" title="Коробка отбора мощности (КОМ)" aria-label="КОМ"><span class="led"></span><svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true"><path d="M31.9 25.0 L35.7 25.9 L35.7 32.1 L31.9 33.0 L31.8 33.3 L34.3 36.4 L30.7 41.3 L27.1 39.8 L26.8 40.0 L27.1 44.0 L21.3 45.8 L19.2 42.5 L18.8 42.5 L16.7 45.8 L10.9 44.0 L11.2 40.0 L10.9 39.8 L7.3 41.3 L3.7 36.4 L6.2 33.3 L6.1 33.0 L2.3 32.1 L2.3 25.9 L6.1 25.0 L6.2 24.7 L3.7 21.6 L7.3 16.7 L10.9 18.2 L11.2 18.0 L10.9 14.0 L16.7 12.2 L18.8 15.5 L19.2 15.5 L21.3 12.2 L27.1 14.0 L26.8 18.0 L27.1 18.2 L30.7 16.7 L34.3 21.6 L31.8 24.7Z M28 29 a9 9 0 1 0 -18 0 a9 9 0 1 0 18 0Z" fill="currentColor" fill-rule="evenodd"/><circle cx="19" cy="29" r="5" fill="none" stroke="currentColor" stroke-width="3"/><path d="M43.3 10.1 L45.7 10.8 L45.7 15.2 L43.3 15.9 L43.2 16.1 L44.5 18.3 L41.3 21.5 L39.1 20.2 L38.9 20.3 L38.2 22.7 L33.8 22.7 L33.1 20.3 L32.9 20.2 L30.7 21.5 L27.5 18.3 L28.8 16.1 L28.7 15.9 L26.3 15.2 L26.3 10.8 L28.7 10.1 L28.8 9.9 L27.5 7.7 L30.7 4.5 L32.9 5.8 L33.1 5.7 L33.8 3.3 L38.2 3.3 L38.9 5.7 L39.1 5.8 L41.3 4.5 L44.5 7.7 L43.2 9.9Z M39.2 13 a3.2 3.2 0 1 0 -6.4 0 a3.2 3.2 0 1 0 6.4 0Z" fill="currentColor" fill-rule="evenodd"/></svg></button>
-        <span class="lbl">КПП</span>
-        <div class="seg" role="group" aria-label="Передача" id="gearSeg">
-          <button data-gear="N">N</button><button data-gear="1">1</button><button data-gear="5">5</button>
-        </div>
-        
-        <button class="toggle amber" id="heaterT" aria-pressed="false"><span class="led"></span>Отопитель насосного отсека</button>
-        <button class="toggle" id="capT" aria-pressed="false"><span class="led"></span>Крышка горловины цистерны открыта</button>
-      </div>
-    </div>
-
     <div class="panel" id="pnlGauges">
       <h2>Приборы насоса <small class="sub mono" id="motoh">наработка 0,00 ч</small></h2>
       <div class="gauges">
@@ -682,45 +697,178 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
 
     <div class="panel schem">
       <h2>Схема потоков <small class="sub">нажмите на кран, вентиль, насос — управление прямо отсюда</small></h2>
-      <svg viewBox="0 0 760 340" id="schem" role="img" aria-label="Схема водопенных коммуникаций: источники, насос, вентили, линии, наполнение, слив, вакуум, продувка">
-  <rect id="sTankBox" x="10" y="40" width="110" height="80" rx="6" fill="var(--plate-2)" stroke="var(--line)"/>
-  <rect id="sTankFill" x="11" y="60" width="108" height="59" fill="var(--water-soft)"/>
-  <text x="65" y="56" text-anchor="middle">Цистерна</text><text x="65" y="112" text-anchor="middle" class="t-muted" id="sTankInfo"></text>
-  <g id="sCapOpen"><rect x="40" y="33" width="50" height="7" rx="2" fill="#2f7cf6"/><text x="128" y="38" class="t-muted" style="font-size:9px">горловина открыта</text></g>
-  <rect id="sSrcBox" x="10" y="185" width="110" height="60" rx="6" fill="var(--plate-2)" stroke="var(--line)"/>
-  <text x="65" y="208" text-anchor="middle" id="sSrcName">Вход DN125</text><text x="65" y="226" text-anchor="middle" class="t-muted" id="sSrcInfo"></text>
-  <rect x="10" y="275" width="80" height="50" rx="6" fill="var(--plate-2)" stroke="var(--line)"/>
-  <rect id="sFoamFill" x="11" y="290" width="78" height="34" fill="#f2c46b" opacity=".7"/>
-  <text x="50" y="288" text-anchor="middle">Пенобак</text><text x="50" y="318" text-anchor="middle" class="t-muted" id="sFoamInfo"></text>
-  <path class="pipe" style="stroke-width:7" d="M120 100 H215 V170"/><path class="flow" id="fTank" d="M120 100 H215 V170"/><g class="vsym" id="vsTank"><title>затвор цистерны</title><g transform=""><path d="M156 93 L174 107 L174 93 L156 107 Z" class="vbody"/></g><text class="vlab" x="165" y="118" text-anchor="middle">затвор цистерны</text><text class="vpct" id="vsTankp" x="165" y="128" text-anchor="middle"></text></g>
-  <path class="pipe" style="stroke-width:7" d="M120 215 H215 V175"/><path class="flow" id="fSrc" d="M120 215 H215 V175"/>
-  <path class="pipe" style="stroke-width:8" d="M215 172 H262"/><path class="flow" id="fIn" d="M215 172 H262" style="stroke-width:4"/>
-  <text x="225" y="160" class="t-muted" id="tIn"></text>
-  <circle id="sPump" cx="298" cy="172" r="36" fill="var(--plate-2)" stroke="var(--line)" stroke-width="2"/>
-  <g id="impeller"><path d="M298 172 L298 144 M298 172 L322 186 M298 172 L274 186" stroke="var(--muted)" stroke-width="4" stroke-linecap="round"/></g>
-  <text x="322" y="216" class="t-muted" id="sPumpInfo">НЦПК</text>
-  <path class="pipe" style="stroke-width:7" d="M90 300 H185"/><path class="flow" id="fFoam" d="M90 300 H185"/><g class="vsym" id="vsFt"><title>кран пенобака</title><g transform=""><path d="M103 293 L121 307 L121 293 L103 307 Z" class="vbody"/></g><text class="vlab" x="112" y="318" text-anchor="middle">кран пенобака</text><text class="vpct" id="vsFtp" x="112" y="328" text-anchor="middle"></text></g>
-  <circle id="vsDoz" cx="152" cy="300" r="8" fill="var(--plate)" stroke="var(--ink)"/><text x="152" y="287" text-anchor="middle" class="vlab">дозатор</text><text x="162" y="332" text-anchor="middle" class="vpct" id="vsDozp"></text>
-  <path class="pipe" style="stroke-width:7" d="M195 336 V310"/><path class="flow foam" id="fKch" d="M195 336 V310"/><text x="202" y="334" class="t-muted" style="font-size:9px">КЩ</text>
-  <path d="M185 292 L205 296 L205 304 L185 308 Z" fill="var(--plate-2)" stroke="var(--ink)"/><text x="208" y="287" class="vlab">эжектор</text>
-  <path class="pipe" style="stroke-width:7" d="M298 208 V300 H205"/><path class="flow" id="fEjW" d="M298 208 V300 H205"/><g class="vsym" id="vsEj"><title>кран эжектора</title><g transform=""><path d="M246 293 L264 307 L264 293 L246 307 Z" class="vbody"/></g><text class="vlab" x="255" y="318" text-anchor="middle">кран эжектора</text><text class="vpct" id="vsEjp" x="255" y="328" text-anchor="middle"></text></g>
-  <path class="pipe" style="stroke-width:7" d="M195 292 V250 H215 V228"/><path class="flow foam" id="fEjO" d="M195 292 V250 H215 V228"/>
-  <path class="pipe" style="stroke-width:7" d="M286 137 V75 H250"/><path class="flow" id="fVac" d="M286 137 V75 H250"/><g class="vsym" id="vsVac"><title>вакуумный кран</title><g transform="rotate(90 286 105)"><path d="M277 98 L295 112 L295 98 L277 112 Z" class="vbody"/></g><text class="vlab" x="274" y="109" text-anchor="end">вакуумный кран</text><text class="vpct" id="vsVacp" x="274" y="119" text-anchor="end"></text></g>
-  <circle id="sVacPump" cx="238" cy="75" r="12" fill="var(--plate-2)" stroke="var(--line)" stroke-width="2"/><text x="238" y="79" text-anchor="middle" style="font-size:9px">ВН</text>
-  <path class="pipe" style="stroke-width:7" d="M238 63 V44"/><path class="flow air" id="fExh" d="M238 63 V44"/><text x="246" y="48" class="t-muted" style="font-size:9px">выхлоп АВС</text>
-  <path class="pipe" style="stroke-width:7" d="M370 136 L330 156"/><path class="flow air" id="fAir" d="M370 136 L330 156"/><g id="sPurge"><rect x="340" y="122" width="56" height="14" rx="3" fill="transparent"/><text x="392" y="132" text-anchor="end" class="t-muted" style="font-size:9px">продувка</text></g>
-  <path class="pipe" style="stroke-width:7" d="M310 206 V250"/><path class="flow" id="fDrain" d="M310 206 V250"/><g class="vsym" id="vsDrain"><title>слив</title><g transform="rotate(90 310 232)"><path d="M301 225 L319 239 L319 225 L301 239 Z" class="vbody"/></g><text class="vlab" x="322" y="236" text-anchor="start">слив</text><text class="vpct" id="vsDrainp" x="322" y="246" text-anchor="start"></text></g>
-  <path class="pipe" style="stroke-width:7" d="M334 160 H400 V20 H65 V40"/><path class="flow" id="fFill" d="M334 160 H400 V20 H65 V40"/><g class="vsym" id="vsFill"><title>в цистерну</title><g transform=""><path d="M221 13 L239 27 L239 13 L221 27 Z" class="vbody"/></g><text class="vlab" x="244" y="16" text-anchor="start">в цистерну</text><text class="vpct" id="vsFillp" x="244" y="26" text-anchor="start"></text></g>
-  <path class="pipe" style="stroke-width:7" d="M334 166 H420 V70 H600"/><path class="flow" id="fL0" d="M334 166 H420 V70 H600"/><g class="vsym" id="vsL0"><title>вентиль 1</title><g transform=""><path d="M511 63 L529 77 L529 63 L511 77 Z" class="vbody"/></g><text class="vlab" x="520" y="88" text-anchor="middle">вентиль 1</text><text class="vpct" id="vsL0p" x="520" y="98" text-anchor="middle"></text></g>
-  <path class="pipe" style="stroke-width:7" d="M334 176 H600"/><path class="flow" id="fL1" d="M334 176 H600"/><g class="vsym" id="vsL1"><title>вентиль 2</title><g transform=""><path d="M511 169 L529 183 L529 169 L511 183 Z" class="vbody"/></g><text class="vlab" x="520" y="194" text-anchor="middle">вентиль 2</text><text class="vpct" id="vsL1p" x="520" y="204" text-anchor="middle"></text></g>
-  <path class="pipe" style="stroke-width:7" d="M334 186 H380 V280 H420"/><path class="flow" id="fHpS" d="M334 186 H380 V280 H420"/>
-  <rect x="420" y="266" width="56" height="28" rx="5" fill="var(--plate-2)" stroke="var(--line)" id="sHpBox"/><text x="448" y="284" text-anchor="middle" style="font-size:10px">ступень ВД</text>
-  <path class="pipe" style="stroke-width:7" d="M448 294 V336"/><path class="flow" id="fHpDr" d="M448 294 V336"/><g class="vsym" id="vsHpDr"><title>слив ступени ВД</title><g transform="rotate(90 448 314)"><path d="M439 307 L457 321 L457 307 L439 321 Z" class="vbody"/></g><text class="vlab" x="460" y="318" text-anchor="start">слив ВД</text><text class="vpct" id="vsHpDrp" x="460" y="328" text-anchor="start"></text></g><path class="pipe" style="stroke-width:7" d="M476 280 H600"/><path class="flow hp" id="fHp" d="M476 280 H600"/><g class="vsym" id="vsHp"><title>кран ВД</title><g transform=""><path d="M511 273 L529 287 L529 273 L511 287 Z" class="vbody"/></g><text class="vlab" x="520" y="298" text-anchor="middle">кран ВД</text><text class="vpct" id="vsHpp" x="520" y="308" text-anchor="middle"></text></g>
-  <path class="pipe" style="stroke-width:7" d="M570 320 V284"/><path class="flow air" id="fReelAir" d="M570 320 V284"/><g id="sReelP"><rect x="562" y="320" width="84" height="14" rx="3" fill="transparent"/><text x="576" y="330" class="t-muted" style="font-size:9px">продувка катушки</text></g>
-  <text x="606" y="66" id="tL0">Линия 1</text><text x="606" y="80" class="t-muted" id="tL0b"></text>
-  <text x="606" y="172" id="tL1">Линия 2</text><text x="606" y="186" class="t-muted" id="tL1b"></text>
-  <text x="606" y="276" id="tHp">Катушка ВД</text><text x="606" y="290" class="t-muted" id="tHpb"></text>
-  <g transform="translate(560 18)" class="t-muted" style="font-size:9px"><path d="M0 -4 L12 4 L12 -4 L0 4Z" class="vbody v1"/><text x="16" y="3" class="t-muted" style="font-size:9px">открыт</text><path d="M0 10 L12 18 L12 10 L0 18Z" class="vbody vp"/><text x="16" y="17" class="t-muted" style="font-size:9px">частично</text><path d="M0 24 L12 32 L12 24 L0 32Z" class="vbody v0"/><text x="16" y="31" class="t-muted" style="font-size:9px">закрыт</text></g>
+      <svg viewBox="0 0 900 475" id="schem" role="img" aria-label="Схема водопенных коммуникаций: источники, насос, вентили, линии, наполнение, сливы, вакуумная система, сжатый воздух">
+<rect id="sTankBox" x="20" y="48" width="120" height="86" rx="6" fill="var(--plate-2)" stroke="var(--line)"/>
+<rect id="sTankFill" x="21" y="68" width="118" height="65" fill="var(--water-soft)"/>
+<text x="80" y="63" text-anchor="middle" class="">Цистерна</text>
+<text x="80" y="126" text-anchor="middle" class="t-muted" id="sTankInfo"></text>
+<g id="sCapOpen"><rect x="38" y="41" width="40" height="7" rx="2" fill="#2f7cf6"/><text x="36" y="36" class="t-muted" style="font-size:9px">горловина открыта</text></g>
+<path class="pipe" style="stroke-width:6" d="M34 134 V178"/>
+<path class="flow " id="fTankDr" d="M34 134 V178" style="stroke-width:2.5"/>
+<g class="vsym" id="vsTankDr"><title>Слив воды из цистерны (кнопка на пульте АЦ)</title><path d="M27 147 L41 165 L27 165 L41 147 Z" class="vbody"/><path d="M34 156 H21" stroke="var(--ink)" stroke-width="1.4" fill="none"/><path d="M21 148 A8 8 0 0 0 21 164 Z" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.3"/></g>
+<text x="46" y="158" text-anchor="start" class="vlab">слив цистерны</text>
+<text x="46" y="168" text-anchor="start" class="vpct" id="vsTankDrp"></text>
+<path d="M34 178 v10 M29 183 L34 189 L39 183" stroke="#4aa3df" stroke-width="1.6" fill="none"/>
+<rect id="sSrcBox" x="20" y="200" width="120" height="58" rx="6" fill="var(--plate-2)" stroke="var(--line)"/>
+<text x="80" y="222" text-anchor="middle" class="" id="sSrcName">Вход DN125</text>
+<text x="80" y="242" text-anchor="middle" class="t-muted" id="sSrcInfo"></text>
+<rect x="20" y="338" width="80" height="56" rx="6" fill="var(--plate-2)" stroke="var(--line)"/>
+<rect id="sFoamFill" x="21" y="353" width="78" height="40" fill="#f2c46b" opacity=".7"/>
+<text x="60" y="351" text-anchor="middle" class="">Пенобак</text>
+<text x="60" y="388" text-anchor="middle" class="t-muted" id="sFoamInfo"></text>
+<path class="pipe" style="stroke-width:7" d="M140 110 H250 V226"/>
+<path class="flow " id="fTank" d="M140 110 H250 V226" style="stroke-width:3"/>
+<g class="vsym" id="vsTank"><title>Затвор «Вода из цистерны»</title><path d="M181 103 L199 117 L199 103 L181 117 Z" class="vbody"/><path d="M190 101 V119" stroke="var(--ink)" stroke-width="1.4" fill="none"/></g>
+<text x="190" y="100" text-anchor="middle" class="vlab">затвор «Вода из цистерны»</text>
+<text x="190" y="128" text-anchor="middle" class="vpct" id="vsTankp"></text>
+<path class="pipe" style="stroke-width:7" d="M140 230 H246"/>
+<path class="flow " id="fSrc" d="M140 230 H246" style="stroke-width:3"/>
+<path class="pipe" style="stroke-width:8" d="M250 230 H292"/>
+<path class="flow " id="fIn" d="M250 230 H292" style="stroke-width:4"/>
+<path d="M268 226 L275 230 L268 234" class="arr"/>
+<path d="M161 226 L168 230 L161 234" class="arr"/>
+<path d="M218 106 L225 110 L218 114" class="arr"/>
+<g class="gsym"><path d="M250 178 L226 178" stroke="var(--line)" stroke-width="2"/><circle cx="226" cy="178" r="8" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.2"/><path d="M226 178 L231 174" stroke="var(--ink)" stroke-width="1.4"/><title>Мановакуумметр на входе</title></g>
+<text x="226" y="165" text-anchor="middle" class="t-muted" style="font-size:9px">вход</text>
+<text x="256" y="220" text-anchor="start" class="t-muted" id="tIn" style="font-size:9px"></text>
+<circle id="sPump" cx="330" cy="230" r="38" fill="var(--plate-2)" stroke="var(--ink)" stroke-width="1.6"/>
+<path d="M330 192 L368 230 L330 268" fill="none" stroke="var(--line)" stroke-width="1.2" opacity=".0"/>
+<g id="impeller"><path d="M330 230 L330 204 M330 230 L352.5 243 M330 230 L307.5 243" stroke="var(--muted)" stroke-width="4" stroke-linecap="round"/></g>
+<path d="M358 222 L370 230 L358 238 Z" fill="var(--ink)"/>
+<text x="348" y="338" text-anchor="middle" class="t-muted" id="sPumpInfo" style="font-size:9px">НЦПК</text>
+<circle id="sFillSens" cx="357" cy="203" r="5" fill="var(--lamp-off)" stroke="var(--ink)"><title>Датчик заполнения: сигнал «Насос заполнен» на БУК</title></circle>
+<text x="366" y="198" text-anchor="start" class="t-muted" style="font-size:9px">датчик</text>
+<path class="pipe" style="stroke-width:6" d="M330 192 V112"/>
+<path class="flow vac" id="fVac" d="M330 192 V112" style="stroke-width:2.5"/>
+<g class="vsym" id="vsVac"><title>Кран вакуумный</title><path d="M323 147 L337 165 L323 165 L337 147 Z" class="vbody"/><circle cx="330" cy="156" r="2.6" fill="var(--ink)"/><path d="M330 156 L318 146" stroke="var(--ink)" stroke-width="1.4" fill="none"/></g>
+<text x="342" y="152" text-anchor="start" class="vlab">кран вакуумный</text>
+<text x="342" y="162" text-anchor="start" class="vpct" id="vsVacp"></text>
+<g id="sVacUnit"><title>Вакуумный агрегат: вакуумный насос с электродвигателем, управляется с БУК-02 («ВАКУУМ»)</title><rect x="296" y="78" width="104" height="34" rx="6" fill="none" stroke="var(--line)" stroke-dasharray="4 3"/><circle id="sVacPump" cx="330" cy="98" r="12" fill="var(--plate-2)" stroke="var(--ink)" stroke-width="1.4"/><g id="vacVanes"><path d="M330 98 L330 88 M330 98 L338.7 103 M330 98 L321.3 103" stroke="var(--muted)" stroke-width="2.4" stroke-linecap="round"/></g><path d="M342 96 H366 M342 100 H366" stroke="var(--ink)" stroke-width="1.2"/><circle id="sVacMotor" cx="378" cy="98" r="11" fill="var(--plate-2)" stroke="var(--ink)" stroke-width="1.4"/><text x="378" y="102" text-anchor="middle" style="font-size:10px;font-weight:700">М</text></g>
+<text x="348" y="74" text-anchor="middle" class="vlab">вакуумный агрегат</text>
+<path class="pipe" style="stroke-width:5" d="M318 98 H276 V78"/>
+<path class="flow air" id="fExh" d="M318 98 H276 V78" style="stroke-width:2"/>
+<text x="276" y="72" text-anchor="middle" class="t-muted" style="font-size:9px">выхлоп</text>
+<path class="pipe" style="stroke-width:7" d="M368 230 H440"/>
+<path class="flow" id="fOut" d="M368 230 H440" style="stroke-width:4"/>
+<path class="pipe" style="stroke-width:7" d="M440 20 V370"/>
+<g class="gsym"><path d="M440 196 L462 196" stroke="var(--line)" stroke-width="2"/><circle cx="462" cy="196" r="8" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.2"/><path d="M462 196 L467 192" stroke="var(--ink)" stroke-width="1.4"/><title>Манометр выхода НД</title></g>
+<text x="474" y="199" text-anchor="start" class="t-muted" style="font-size:9px">выход НД</text>
+<path class="pipe" style="stroke-width:7" d="M440 230 V20 H80 V48"/>
+<path class="flow " id="fFill" d="M440 230 V20 H80 V48" style="stroke-width:3"/>
+<g class="vsym" id="vsFill"><title>Вентиль подачи воды в цистерну</title><path d="M241 13 L259 27 L259 13 L241 27 Z" class="vbody"/><path d="M250 20 V6 M244 6 H256" stroke="var(--ink)" stroke-width="1.4" fill="none"/></g>
+<text x="250" y="40" text-anchor="middle" class="vlab">вентиль подачи воды в цистерну</text>
+<text x="250" y="50" text-anchor="middle" class="vpct" id="vsFillp"></text>
+<path d="M154 16 L147 20 L154 24" class="arr"/>
+<path d="M436 64 L440 57 L444 64" class="arr"/>
+<path class="pipe" style="stroke-width:7" d="M440 150 H690"/>
+<path class="flow " id="fL0" d="M440 150 H690" style="stroke-width:3"/>
+<g class="vsym" id="vsL0"><title>Вентиль напорный нормального давления, левый</title><path d="M551 143 L569 157 L569 143 L551 157 Z" class="vbody"/><path d="M560 150 V136 M554 136 H566" stroke="var(--ink)" stroke-width="1.4" fill="none"/></g>
+<text x="560" y="170" text-anchor="middle" class="vlab">вентиль напорный НД, левый</text>
+<text x="560" y="180" text-anchor="middle" class="vpct" id="vsL0p"></text>
+<path d="M616 146 L623 150 L616 154" class="arr"/>
+<path class="pipe" style="stroke-width:7" d="M440 250 H690"/>
+<path class="flow " id="fL1" d="M440 250 H690" style="stroke-width:3"/>
+<g class="vsym" id="vsL1"><title>Вентиль напорный нормального давления, правый</title><path d="M551 243 L569 257 L569 243 L551 257 Z" class="vbody"/><path d="M560 250 V236 M554 236 H566" stroke="var(--ink)" stroke-width="1.4" fill="none"/></g>
+<text x="560" y="270" text-anchor="middle" class="vlab">вентиль напорный НД, правый</text>
+<text x="560" y="280" text-anchor="middle" class="vpct" id="vsL1p"></text>
+<path d="M616 246 L623 250 L616 254" class="arr"/>
+<text x="698" y="147" text-anchor="start" class="" id="tL0">Линия 1</text>
+<text x="698" y="161" text-anchor="start" class="t-muted" id="tL0b" style="font-size:10px"></text>
+<text x="698" y="247" text-anchor="start" class="" id="tL1">Линия 2</text>
+<text x="698" y="261" text-anchor="start" class="t-muted" id="tL1b" style="font-size:10px"></text>
+<path class="pipe" style="stroke-width:7" d="M440 330 H492"/>
+<path class="flow " id="fHpS" d="M440 330 H492" style="stroke-width:3"/>
+<rect x="492" y="314" width="76" height="32" rx="5" fill="var(--plate-2)" stroke="var(--line)" id="sHpBox"/>
+<text x="530" y="334" text-anchor="middle" class="" style="font-size:10px">ступень ВД</text>
+<path class="pipe" style="stroke-width:7" d="M568 330 H690"/>
+<path class="flow hp" id="fHp" d="M568 330 H690" style="stroke-width:3"/>
+<g class="vsym" id="vsHp"><title>Кран высокого давления</title><path d="M595 323 L613 337 L613 323 L595 337 Z" class="vbody"/><circle cx="604" cy="330" r="3.2" fill="var(--ink)"/></g>
+<text x="604" y="350" text-anchor="middle" class="vlab">кран высокого давления</text>
+<text x="604" y="360" text-anchor="middle" class="vpct" id="vsHpp"></text>
+<g class="gsym"><path d="M640 330 L640 308" stroke="var(--line)" stroke-width="2"/><circle cx="640" cy="308" r="8" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.2"/><path d="M640 308 L645 304" stroke="var(--ink)" stroke-width="1.4"/><title>Манометр высокого давления</title></g>
+<text x="651" y="303" text-anchor="start" class="t-muted" style="font-size:9px">ВД</text>
+<path d="M671 326 L678 330 L671 334" class="arr"/>
+<text x="698" y="327" text-anchor="start" class="" id="tHp">Катушка ВД</text>
+<text x="698" y="341" text-anchor="start" class="t-muted" id="tHpb" style="font-size:10px"></text>
+<path class="pipe" style="stroke-width:6" d="M530 346 V400"/>
+<path class="flow " id="fHpDr" d="M530 346 V400" style="stroke-width:2.5"/>
+<g class="vsym" id="vsHpDr"><title>Сливные краны ступени ВД (пневмопривод)</title><path d="M523 363 L537 381 L523 381 L537 363 Z" class="vbody"/><path d="M530 372 H517" stroke="var(--ink)" stroke-width="1.4" fill="none"/><path d="M517 364 A8 8 0 0 0 517 380 Z" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.3"/></g>
+<text x="544" y="370" text-anchor="start" class="vlab">слив ступени ВД</text>
+<text x="544" y="380" text-anchor="start" class="vpct" id="vsHpDrp"></text>
+<path d="M530 400 v10 M525 405 L530 411 L535 405" stroke="#4aa3df" stroke-width="1.6" fill="none"/>
+<path class="pipe" style="stroke-width:6" d="M330 268 V312"/>
+<path class="flow " id="fDrain" d="M330 268 V312" style="stroke-width:2.5"/>
+<g class="vsym" id="vsDrain"><title>Кран слива насоса (пневмопривод)</title><path d="M323 281 L337 299 L323 299 L337 281 Z" class="vbody"/><path d="M330 290 H317" stroke="var(--ink)" stroke-width="1.4" fill="none"/><path d="M317 282 A8 8 0 0 0 317 298 Z" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.3"/></g>
+<text x="344" y="302" text-anchor="start" class="vlab">слив насоса</text>
+<text x="344" y="312" text-anchor="start" class="vpct" id="vsDrainp"></text>
+<path d="M330 312 v10 M325 317 L330 323 L335 317" stroke="#4aa3df" stroke-width="1.6" fill="none"/>
+<path class="pipe" style="stroke-width:7" d="M100 366 H246"/>
+<path class="flow foam" id="fFoam" d="M100 366 H246" style="stroke-width:3"/>
+<g class="vsym" id="vsFt"><title>Кран магистрали пенобака</title><path d="M123 359 L141 373 L141 359 L123 373 Z" class="vbody"/><circle cx="132" cy="366" r="2.6" fill="var(--ink)"/><path d="M132 366 L122 354" stroke="var(--ink)" stroke-width="1.4" fill="none"/></g>
+<text x="132" y="386" text-anchor="middle" class="vlab">кран пенобака</text>
+<text x="132" y="396" text-anchor="middle" class="vpct" id="vsFtp"></text>
+<circle id="vsDoz" cx="194" cy="366" r="8" fill="var(--plate)" stroke="var(--ink)"/><path d="M186 376 L202 356 M198 356 h4 v4" stroke="var(--ink)" stroke-width="1.2" fill="none"/>
+<text x="194" y="350" text-anchor="middle" class="vlab">дозатор</text>
+<text x="194" y="388" text-anchor="middle" class="vpct" id="vsDozp"></text>
+<path class="pipe" style="stroke-width:6" d="M224 430 V366"/>
+<path class="flow foam" id="fKch" d="M224 430 V366" style="stroke-width:2.5"/>
+<text x="230" y="428" text-anchor="start" class="t-muted" style="font-size:9px">рукав КЩ</text>
+<path d="M240 358 L262 362 L262 370 L240 374 Z" fill="var(--plate-2)" stroke="var(--ink)"/>
+<text x="252" y="396" text-anchor="middle" class="vlab">эжектор</text>
+<path class="pipe" style="stroke-width:7" d="M250 358 V232"/>
+<path class="flow foam" id="fEjO" d="M250 358 V232" style="stroke-width:3"/>
+<path class="pipe" style="stroke-width:7" d="M440 370 V366 H262"/>
+<path class="flow " id="fEjW" d="M440 370 V366 H262" style="stroke-width:3"/>
+<g class="vsym" id="vsEj"><title>Рукоятка включения эжектора</title><path d="M371 359 L389 373 L389 359 L371 373 Z" class="vbody"/><circle cx="380" cy="366" r="2.6" fill="var(--ink)"/><path d="M380 366 L370 354" stroke="var(--ink)" stroke-width="1.4" fill="none"/></g>
+<text x="380" y="386" text-anchor="middle" class="vlab">кран эжектора</text>
+<text x="380" y="396" text-anchor="middle" class="vpct" id="vsEjp"></text>
+<path d="M304 362 L297 366 L304 370" class="arr"/>
+<path d="M246 304 L250 297 L254 304" class="arr"/>
+<rect id="sAirSrc" x="772" y="56" width="116" height="30" rx="5" fill="var(--plate-2)" stroke="var(--line)"><title>Пневмосистема шасси: сжатый воздух для продувки и пневмоприводов</title></rect>
+<text x="830" y="69" text-anchor="middle" class="vlab">пневмосистема</text>
+<text x="830" y="80" text-anchor="middle" class="vlab">шасси (ресивер)</text>
+<path class="pipe" style="stroke-width:4" d="M772 71 H520"/>
+<path class="flow air" id="fAirSup" d="M772 71 H520" style="stroke-width:2"/>
+<g class="gsym"><path d="M740 71 L740 50" stroke="var(--line)" stroke-width="2"/><circle cx="740" cy="50" r="8" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.2"/><path d="M740 50 L745 46" stroke="var(--ink)" stroke-width="1.4"/><title>Манометр воздуха</title></g>
+<text x="751" y="47" text-anchor="start" class="t-muted" style="font-size:9px">воздух</text>
+<path class="pipe" style="stroke-width:4" d="M520 71 V112 H440"/>
+<path class="flow air" id="fAir" d="M520 71 V112 H440" style="stroke-width:2"/>
+<g id="sPurge"><title>Пневмоклапан «Клапан осушения»: продувка насоса и рукавных линий сжатым воздухом. Держите «Продувка» на БУК</title><rect x="509" y="84" width="22" height="18" rx="2" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.3" class="solbody"/><path d="M513 98 L527 88" stroke="var(--ink)" stroke-width="1.3"/><path d="M531 93 h5 M536 88 v10" stroke="var(--ink)" stroke-width="1.2"/></g>
+<text x="520" y="79" text-anchor="middle" class="vlab">клапан осушения</text>
+<text x="520" y="114" text-anchor="middle" class="t-muted" style="font-size:8px">БУК «Продувка»</text>
+<path class="pipe" style="stroke-width:4" d="M610 71 V84"/>
+<g id="sDrSol"><title>Пневмоклапан «Сливные краны»: открывает пневмоприводы крана слива насоса и сливных кранов ступени ВД. Кнопка «Слив» на БУК</title><rect x="599" y="84" width="22" height="18" rx="2" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.3" class="solbody"/><path d="M603 98 L617 88" stroke="var(--ink)" stroke-width="1.3"/><path d="M621 93 h5 M626 88 v10" stroke="var(--ink)" stroke-width="1.2"/></g>
+<text x="610" y="79" text-anchor="middle" class="vlab">сливные краны</text>
+<text x="610" y="114" text-anchor="middle" class="t-muted" style="font-size:8px">БУК «Слив»</text>
+<path id="fCtl" class="ctl" d="M610 102 V128 M317 290 H300 M517 372 H500" fill="none"/>
+<text x="614" y="138" text-anchor="start" class="t-muted" style="font-size:8px">→ к пневмоприводам сливов</text>
+<text x="298" y="287" text-anchor="end" class="t-muted" style="font-size:8px">от «Сливные</text>
+<text x="298" y="296" text-anchor="end" class="t-muted" style="font-size:8px">краны»</text>
+<text x="498" y="369" text-anchor="end" class="t-muted" style="font-size:8px">от «Сливные</text>
+<text x="498" y="378" text-anchor="end" class="t-muted" style="font-size:8px">краны»</text>
+<path class="pipe" style="stroke-width:4" d="M660 378 V330"/><path class="flow air" id="fReelAir" d="M660 378 V330" style="stroke-width:2"/>
+<g id="sReelP"><title>Продувка катушки ВД сжатым воздухом: держите кнопку «продувка катушки» на пульте АЦ</title><rect x="649" y="379" width="22" height="18" rx="2" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.3" class="solbody"/><path d="M653 393 L667 383" stroke="var(--ink)" stroke-width="1.3"/><path d="M671 388 h5 M676 383 v10" stroke="var(--ink)" stroke-width="1.2"/></g>
+<text x="660" y="374" text-anchor="middle" class="vlab"></text>
+<text x="660" y="409" text-anchor="middle" class="t-muted" style="font-size:8px"></text>
+<text x="676" y="385" text-anchor="start" class="vlab">продувка катушки</text>
+<text x="676" y="395" text-anchor="start" class="t-muted" style="font-size:8px">воздух из пневмосистемы,</text>
+<text x="676" y="404" text-anchor="start" class="t-muted" style="font-size:8px">кнопка на пульте АЦ</text>
+<g transform="translate(20 446)"><path d="M0 0 H22" stroke="var(--water)" stroke-width="3"/><text x="26" y="3" class="t-muted" style="font-size:9px">вода</text></g>
+<g transform="translate(80 446)"><path d="M0 0 H22" stroke="#9bbf2a" stroke-width="3"/><text x="26" y="3" class="t-muted" style="font-size:9px">раствор пенообразователя</text></g>
+<g transform="translate(262 446)"><path d="M0 0 H22" stroke="#e7a83a" stroke-width="3"/><text x="26" y="3" class="t-muted" style="font-size:9px">пенообразователь</text></g>
+<g transform="translate(400 446)"><path d="M0 0 H22" stroke="#3fb8d8" stroke-width="2" stroke-dasharray="3 4"/><text x="26" y="3" class="t-muted" style="font-size:9px">сжатый воздух</text></g>
+<g transform="translate(506 446)"><path d="M0 0 H22" stroke="#8b96a0" stroke-width="2" stroke-dasharray="2 3"/><text x="26" y="3" class="t-muted" style="font-size:9px">разрежение</text></g>
+<g transform="translate(606 446)"><path d="M0 0 H22" stroke="#3fb8d8" stroke-width="1.4" stroke-dasharray="6 3 1 3"/><text x="26" y="3" class="t-muted" style="font-size:9px">пневмоуправление</text></g>
+<g transform="translate(20 466)"><path d="M2 -5 L20 5 L20 -5 L2 5 Z" class="vbody v1"/><text x="26" y="3" class="t-muted" style="font-size:9px">открыт</text></g>
+<g transform="translate(84 466)"><path d="M2 -5 L20 5 L20 -5 L2 5 Z" class="vbody vp"/><text x="26" y="3" class="t-muted" style="font-size:9px">частично</text></g>
+<g transform="translate(160 466)"><path d="M2 -5 L20 5 L20 -5 L2 5 Z" class="vbody v0"/><text x="26" y="3" class="t-muted" style="font-size:9px">закрыт</text></g>
+<g transform="translate(226 466)"><path d="M2 -5 L20 5 L20 -5 L2 5 Z" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.1"/><path d="M11 0 V-9 M7 -9 H15" stroke="var(--ink)" stroke-width="1.3" fill="none"/><text x="26" y="3" class="t-muted" style="font-size:9px">вентиль</text></g>
+<g transform="translate(300 466)"><path d="M2 -5 L20 5 L20 -5 L2 5 Z" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.1"/><circle cx="11" cy="0" r="2.4" fill="var(--ink)"/><text x="26" y="3" class="t-muted" style="font-size:9px">шаровой кран</text></g>
+<g transform="translate(400 466)"><path d="M2 -5 L20 5 L20 -5 L2 5 Z" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.1"/><path d="M11 -6 V6" stroke="var(--ink)" stroke-width="1.3" fill="none"/><text x="26" y="3" class="t-muted" style="font-size:9px">затвор</text></g>
+<g transform="translate(464 466)"><path d="M2 -5 L20 5 L20 -5 L2 5 Z" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.1"/><path d="M11 0 V-8" stroke="var(--ink)" stroke-width="1.3" fill="none"/><path d="M6 -8 A5 5 0 0 1 16 -8 Z" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.1"/><text x="26" y="3" class="t-muted" style="font-size:9px">пневмопривод</text></g>
+<g transform="translate(576 466)"><rect x="3" y="-6" width="16" height="12" rx="2" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.1"/><path d="M6 4 L16 -4" stroke="var(--ink)" stroke-width="1.1"/><text x="26" y="3" class="t-muted" style="font-size:9px">пневмоклапан</text></g>
+<g transform="translate(676 466)"><circle cx="11" cy="0" r="6" fill="var(--plate)" stroke="var(--ink)" stroke-width="1.1"/><path d="M11 0 L15 -3" stroke="var(--ink)" stroke-width="1.2"/><text x="26" y="3" class="t-muted" style="font-size:9px">манометр</text></g>
+<g transform="translate(756 466)"><path d="M11 -6 v10 M7 0 L11 6 L15 0" stroke="#4aa3df" stroke-width="1.5" fill="none"/><text x="26" y="3" class="t-muted" style="font-size:9px">слив под машину</text></g>
 </svg>
     </div>
   </section>
@@ -1711,12 +1859,12 @@ function render(){
   $('#sSrcName').textContent=S.src==='tank'?'Вход: заглушка':S.src==='hydrant'?(S.hyd.kind==='relay'?'Вход: от АЦ':'Вход: гидрант'):'Вход: водоём';
   $('#sSrcInfo').textContent=S.src==='tank'?'':S.src==='hydrant'?(S.hyd.open?'':'закрыт · ')+'сеть '+fmt(S.faults.weaknet?0.08:S.hyd.P)+' МПа':'h = '+fmt(S.res.hgeo,1)+' м';
   $('#sTankInfo').textContent=Math.round(S.tankL)+' л';
-  {const hh=S.tankL/1600*59;$('#sTankFill').setAttribute('height',hh.toFixed(1));$('#sTankFill').setAttribute('y',(119-hh).toFixed(1));
-   const fh=S.foamL/100*34;$('#sFoamFill').setAttribute('height',fh.toFixed(1));$('#sFoamFill').setAttribute('y',(324-fh).toFixed(1));$('#sFoamInfo').textContent=Math.round(S.foamL)+' л';
+  {const hh=S.tankL/1600*65;$('#sTankFill').setAttribute('height',hh.toFixed(1));$('#sTankFill').setAttribute('y',(133-hh).toFixed(1));
+   const fh=S.foamL/100*40;$('#sFoamFill').setAttribute('height',fh.toFixed(1));$('#sFoamFill').setAttribute('y',(393-fh).toFixed(1));$('#sFoamInfo').textContent=Math.round(S.foamL)+' л';
    $('#sCapOpen').style.display=S.fillerCap?'':'none';
    const vs=(id,v,txt)=>{const g=document.getElementById(id);if(!g)return;const b=g.querySelector('.vbody');b.setAttribute('class','vbody '+(v>=0.98?'v1':v<=0.02?'v0':'vp'));const t=document.getElementById(id+'p');if(t)t.textContent=txt!==undefined?txt:(v>0.02&&v<0.98?Math.round(v*100)+' %':'')};
    const tr=v=>v>0.02&&v<0.98?fmt(v*3,1)+' об.':'';
-   vs('vsTank',S.v.tank?1:0);vs('vsFt',S.foamTankValve?1:0);vs('vsEj',S.foamValve?1:0);vs('vsVac',S.v.vacValve?1:0);vs('vsDrain',S.v.drain?1:0);vs('vsHpDr',S.v.hpDrain?1:0);
+   vs('vsTank',S.v.tank?1:0);vs('vsFt',S.foamTankValve?1:0);vs('vsEj',S.foamValve?1:0);vs('vsVac',S.v.vacValve?1:0);vs('vsDrain',S.v.drain?1:0);vs('vsHpDr',S.v.hpDrain?1:0);vs('vsTankDr',S.tankDrain?1:0);
    vs('vsFill',S.v.fill,tr(S.v.fill));vs('vsL0',S.v.out[0],tr(S.v.out[0]));vs('vsL1',S.v.out[1],tr(S.v.out[1]));vs('vsHp',S.v.hp,S.v.hp>0.02&&S.v.hp<0.98?'полуоткр.':'');
    $('#vsDoz').setAttribute('fill',S.doz>0.01?'#f2c46b':'var(--plate)');$('#vsDozp').textContent=S.doz>0.01?fmt(q6(S.doz),0)+' л/с':'закр.';
    $('#sHpBox').setAttribute('stroke',S.hpOn?'#c42a1d':'var(--line)');
@@ -1729,18 +1877,23 @@ function render(){
 }
 // анимация потоков
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const flowEls={fHpDr:0,fTank:0,fSrc:0,fFoam:0,fKch:0,fEjW:0,fEjO:0,fVac:0,fExh:0,fAir:0,fDrain:0,fHpS:0,fReelAir:0,fIn:0,fL0:0,fL1:0,fHp:0,fFill:0,sc_h0:0,sc_h1:0,sc_hhp:0,sc_hf:0};
+const flowEls={fOut:0,fTankDr:0,fAirSup:0,fHpDr:0,fTank:0,fSrc:0,fFoam:0,fKch:0,fEjW:0,fEjO:0,fVac:0,fExh:0,fAir:0,fDrain:0,fHpS:0,fReelAir:0,fIn:0,fL0:0,fL1:0,fHp:0,fFill:0,sc_h0:0,sc_h1:0,sc_hhp:0,sc_hf:0};
 let lastFrame=performance.now(), rot=0;
 function anim(now){
   const dt=Math.min(0.1,(now-lastFrame)/1000);lastFrame=now;
   if(S){const c=S.calc;
     const qpo=S.foamValve&&S.doz>0.01&&S.pumpRpm>300?c.Q*(c.conc||0)/100:0,ejw=S.foamValve&&S.pumpRpm>300&&S.fill>0.9?1.6:0,vacA=S.vacPump&&S.v.vacValve?2:0;
     const map={fTank:c.tankQ||0,fSrc:S.src!=='tank'&&!(c.tankQ>0)?c.Q+Math.max(0,-(c.tankQ||0)):0,fFoam:S.foamTankValve?qpo:0,fKch:!S.foamTankValve&&S.kch!=='none'?qpo:0,fEjW:ejw,fEjO:ejw?ejw+qpo:0,
-      fVac:vacA,fExh:vacA,fAir:S.purge?2:0,fDrain:S.v.drain&&S.fill>0.05?3:0,fHpS:c.q,fHpDr:S.v.hpDrain&&(S.fill>0.05||S.pumpRpm>300)?2.5:0,fReelAir:S.reel?2:0,
+      fVac:vacA,fExh:vacA,fAir:S.purge?2:0,fOut:c.Q+c.Qfill+(c.q||0),fTankDr:S.tankDrain&&S.tankL>1?3:0,fAirSup:S.purge||S.reel?2:0,fDrain:S.v.drain&&S.fill>0.05?3:0,fHpS:c.q,fHpDr:S.v.hpDrain&&(S.fill>0.05||S.pumpRpm>300)?2.5:0,fReelAir:S.reel?2:0,
       fIn:c.Q,fL0:c.Qi[0],fL1:c.Qi[1],fHp:c.q,fFill:c.Qfill,sc_h0:c.Qi[0],sc_h1:c.Qi[1],sc_hhp:c.q,sc_hf:c.Qfill};
     for(const k in map){const el=document.getElementById(k);if(!el)continue;const q=map[k]||0;el.classList.toggle('off',q<0.05);
       if(!reduce){flowEls[k]=(flowEls[k]-q*dt*12*(S.speed||0))%1000;el.style.strokeDashoffset=flowEls[k]}}
-    if(!reduce){rot=(rot+S.pumpRpm/60*360*dt*0.05*(S.speed||0))%360;$('#impeller').setAttribute('transform',`rotate(${rot.toFixed(1)} 298 172)`)}
+    if(!reduce){rot=(rot+S.pumpRpm/60*360*dt*0.05*(S.speed||0))%360;$('#impeller').setAttribute('transform',`rotate(${rot.toFixed(1)} 330 230)`);
+      if(S.vacPump){SC.vrot=((SC.vrot||0)+360*dt*1.5*(S.speed||0))%360;const vv=document.getElementById('vacVanes');if(vv)vv.setAttribute('transform',`rotate(${SC.vrot.toFixed(1)} 330 98)`)}}
+    {const m=document.getElementById('sVacMotor');if(m)m.style.fill=S.vacPump?'var(--amber-bg)':'';const fs=document.getElementById('sFillSens');if(fs)fs.style.fill=S.buPower&&S.fill>0.98?'#3fbf6a':'var(--lamp-off)';
+      const so=(id,on)=>{const e=document.querySelector('#'+id+' .solbody');if(e)e.classList.toggle('on',!!on)};so('sPurge',S.purge);so('sDrSol',S.v.drain);so('sReelP',S.reel);
+      const ct=document.getElementById('fCtl');if(ct)ct.classList.toggle('on',!!S.v.drain);
+      const sol=(S.calc.conc||0)>0.3;['fOut','fL0','fL1','fFill','fIn','fHpS'].forEach(i=>{const e=document.getElementById(i);if(e)e.classList.toggle('sol',sol)})}
   }
   requestAnimationFrame(anim);
 }
@@ -2493,6 +2646,113 @@ function bindTips(){
     g.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'){showHoverTip(g.id,e.clientX,e.clientY);clearTimeout(bindTips.t);bindTips.t=setTimeout(hideHoverTip,2200)}});
   });
 }
+/* ===== Крупный план: фотографии элемента в текущем положении и другие ракурсы ===== */
+const CU_BASE='photos/',CU_WEB='https://yusdyr.github.io/fire-pump-trainer-rus/emulator/photos/';
+const CU_BUK=[['a163130','БУК-02 спереди'],['a163129','БУК-02 и дозатор'],['a163137','БУК-02, эжектор, дозатор']];
+const CU_PULT=[['a154629','пульт АЦ'],['a163142','пульт АЦ']];
+const CU_ALL=[['a154659','отсек целиком'],['b220029','отсек целиком'],['a154623','отсек с дверью'],['b220017','отсек издалека'],['b220020','отсек издалека'],['a154650','отсек'],['a154653','отсек']];
+const P_=(a,s)=>a.map(([p,t,v])=>({p,t,s:v===undefined?s:v}));
+const CU={
+ sc_vac:{n:'Кран вакуумный',st:()=>S.v.vacValve?1:0,sl:v=>v>0.9?'открыт':v<0.1?'закрыт':'промежуточное положение',ph:P_([['b222211','спереди',0],['b222157','общий вид',0],['b222144','общий вид',0],['b220058','сбоку снизу',0],['b220103','сбоку снизу',0],['b222209','поворот на треть',0.33],['b222200','на полпути, общий вид',0.5],['b222207','поворот на две трети',0.67],['b222204','спереди',1],['b222155','общий вид',1],['b222147','общий вид',1]])},
+ sc_hpv:{n:'Кран высокого давления',st:()=>S.v.hp,sl:v=>v>0.9?'открыт':v<0.1?'закрыт':'полуоткрыт',ph:P_([['b220108','спереди',0],['b215504','сбоку',0],['a163125','общий вид',0],['b220113','спереди',0.5],['b220120','спереди',1]])},
+ sc_ft:{n:'Кран магистрали пенобака',st:()=>S.foamTankValve?1:0,sl:v=>v>0.5?'открыт':'закрыт',ph:P_([['b220037','спереди',0],['b215950','спереди',0],['b215456','сбоку',0],['a163139','общий вид',0],['b220041','спереди',1],['b215958','спереди',1],['b220001','сбоку',1]])},
+ sc_kch:{n:'Штуцер КЩ (под краном пенобака)',ph:P_([['b215456','штуцер под заглушкой'],['b220037',''],['a163139','']],null)},
+ sc_ej:{n:'Рукоятка включения эжектора',st:()=>S.foamValve?1:0,sl:v=>v>0.5?'открыт':'закрыт',ph:P_([['b215944','спереди',0],['a163137','с БУК',0],['b215940','спереди',1]])},
+ sc_tank:{n:'Затвор «Вода из цистерны»',st:()=>S.v.tank?1:0,sl:v=>v>0.5?'открыт — рычаг на себя':'закрыт — рычаг вдоль стенки',ph:P_([['b215647','спереди',0],['a163204','спереди',0],['a163205','спереди',0],['b215644','сверху',0],['b215651','сбоку',0],['b215625','спереди',1],['b215620','спереди',1],['b215637','сверху',1],['b215629','сбоку',1],['b215632','сбоку',1]])},
+ sc_doz:{n:'Дозатор «Подача насоса»',st:()=>S.doz,sl:v=>v<0.01?'закрыт':'около '+Math.round(q6(v))+' л/с по шкале 6 %',ph:P_([['b215850','',0],['a163035','',0],['a163048','',0],['a163058','',0],['b215853','',0.05],['b215857','',0.15],['b215903','',0.16],['b215906','',0.35],['b215908','',0.54],['b215911','',0.69],['b215915','',0.83],['b215925','',0.98]])},
+ sc_w0:{n:'Вентиль напорный НД, левый',wheel:1,v:()=>S.v.out[0],ph:P_([['b215810','',5],['b215812','',-51],['b215815','',-114],['b215817','',-170],['b215819','',136],['b215821','',93],['b215823','',47],['b215825','',0],['b215827','',-42],['b215830','',-42],['b215831','',-99],['b215833','',172],['b215834','',143],['b215835','',108],['b215836','',70],['b215838','',13],['b215839','',-62],['a163106','общий вид',null],['a163107','общий вид',null],['a163109','общий вид',null]])},
+ sc_w1:{n:'Вентиль напорный НД, правый',wheel:1,v:()=>S.v.out[1],ph:P_([['b215732','',23],['b215735','',-23],['b215737','',-79],['b215739','',-159],['b215741','',166],['b215744','',84],['b215746','',38],['b215748','',-4],['b215750','',-16],['b215752','',-52],['b215753','',-135],['b215755','',176],['b215756','',114],['b215757','',59],['b215759','',12],['b215356','',null],['a163148','общий вид',null]])},
+ sc_wf:{n:'Вентиль подачи воды в цистерну',ph:P_([['a163151','']],null)},
+ sc_drain:{n:'Слив: кнопка «Слив» на БУК и пневмоприводы сливных кранов',ph:P_([['a163130','кнопка «Слив» на БУК'],['b215550','пневмопривод крана слива насоса'],['b215551','пневмопривод крана слива насоса'],['b215558','пневмопривод крана слива насоса'],['b215525','пневмопривод сливных кранов ступени ВД'],['b215529','пневмопривод сливных кранов ступени ВД'],['b215540','пневмопривод сливных кранов ступени ВД'],['b215547','пневмопривод сливных кранов ступени ВД, сбоку'],['b215326','пневмоклапаны «Клапан осушения» и «Сливные краны»'],['b215346','пневмоклапаны']],null)},
+ sc_purge:{n:'Продувка: кнопка на БУК и клапан осушения',ph:P_([['a163130','кнопка «Продувка» на БУК'],['b215326','пневмоклапан «Клапан осушения»'],['b215346','пневмоклапан «Клапан осушения»']],null)},
+ li_pneu:{n:'Пневмоклапаны и пневмоприводы слива',ph:P_([['b215326','пневмоклапаны'],['b215346','пневмоклапаны'],['b215550','пневмопривод слива насоса'],['b215525','пневмопривод слива ступени ВД']],null)},
+ gz_out:{n:'Манометр выхода НД (стрелка на снимке — не текущее значение)',ph:P_([['b215349','']],null)},
+ gz_in:{n:'Мановакуумметр на входе (стрелка на снимке — не текущее значение)',ph:P_([['b215609','']],null)},
+ gz_hp:{n:'Манометр высокого давления (стрелка на снимке — не текущее значение)',ph:P_([['b215540',''],['b215525','']],null)},
+ gz_hps:{n:'Манометр воздуха (стрелка на снимке — не текущее значение)',ph:P_([['b222422',''],['b222424',''],['b222428',''],['b215326','']],null)},
+ sc_plate:{n:'Таблички',ph:P_([['a154641','характеристика и схема коммуникаций'],['a154636','']],null)},
+ all:{n:'Насосный отсек',ph:P_(CU_ALL,null)}};
+CU.gz_hps2=CU.gz_hps;
+['sc_buPower','sc_vacStart','sc_hpOn','sc_tachoRpm','sc_tachoH','li_water','li_bad','li_tacho','pa_buk'].forEach(k=>CU[k]={n:'БУК-02',ph:P_(CU_BUK,null)});
+['sc_power','sc_vacMan','sc_tankDrain','sc_clutch','sc_engStop','sc_engStart','sc_reel','sc_rpDn','sc_can','sc_rpUp','li_lw','li_lf','li_al','li_air','li_can','li_kom','pa_pult'].forEach(k=>CU[k]={n:'Пульт АЦ',ph:P_(CU_PULT,null)});
+const CU_HOLD=new Set(['sc_purge','sc_reel','sc_vacMan','sc_rpUp','sc_rpDn','sc_tachoRpm','sc_tachoH']);
+const cuState={k:null,list:[],i:0,z:1,x:0,y:0};
+function cuList(k){
+  const d=CU[k]||CU.all;let L=d.ph.slice();
+  if(d.wheel){const Wh=PH_WHEEL[k];const a=Wh?Wh.a0-d.v()*1080:0;const dist=p=>p.s==null?1e9:Math.abs(((a-p.s)%360+540)%360-180);L.sort((p,q)=>dist(p)-dist(q))}
+  else if(d.st){const v=d.st();L.sort((p,q)=>(p.s==null?9:Math.abs(p.s-v))-(q.s==null?9:Math.abs(q.s-v)))}
+  return L;
+}
+function cuOpen(k){
+  const d=CU[k]||CU.all;cuState.k=CU[k]?k:'all';cuState.list=cuList(cuState.k);cuState.i=0;
+  let m=$('#cuModal');
+  if(!m){m=document.createElement('div');m.id='cuModal';m.className='cumodal';m.innerHTML=`<div class="cuhead"><div><b id="cuTitle"></b><div class="sub" id="cuSub"></div></div><div class="row"><button class="btn" id="cuZoomOut" aria-label="Уменьшить">−</button><button class="btn" id="cuZoomIn" aria-label="Увеличить">+</button><button class="btn" id="cuClose" aria-label="Закрыть">✕</button></div></div>
+    <div class="cuview" id="cuView"><img id="cuImg" alt="" draggable="false"><button class="cunav" id="cuPrev" aria-label="Предыдущий">‹</button><button class="cunav r" id="cuNext" aria-label="Следующий">›</button><div class="cuload" id="cuLoad">загрузка…</div></div>
+    <div class="cuthumbs" id="cuThumbs"></div>`;document.body.appendChild(m);cuBind()}
+  m.hidden=false;document.body.style.overflow='hidden';
+  const st=d.wheel?turnsTxt(d.v()):d.st?d.sl(d.st()):'';
+  $('#cuTitle').textContent=d.n;$('#cuSub').textContent=(st?'Сейчас: '+st+' · ':'')+'первым показан снимок, ближайший к текущему положению';
+  $('#cuThumbs').innerHTML=cuState.list.map((p,i)=>`<button class="cuth" data-i="${i}" title="${p.t||''}"><img loading="lazy" src="${CU_BASE}t/${p.p}.webp" onerror="this.onerror=null;this.src='${CU_WEB}t/${p.p}.webp'" alt=""></button>`).join('');
+  cuShow(0);hideHoverTip();
+}
+function cuShow(i){
+  const L=cuState.list;cuState.i=(i+L.length)%L.length;const p=L[cuState.i];
+  cuState.z=1;cuState.x=0;cuState.y=0;cuApply();
+  const img=$('#cuImg');$('#cuLoad').hidden=false;img.style.opacity=0.3;
+  img.onload=()=>{$('#cuLoad').hidden=true;img.style.opacity=1};
+  img.onerror=()=>{if(!img.src.startsWith(CU_WEB))img.src=CU_WEB+p.p+'.webp';else $('#cuLoad').textContent='снимок недоступен без интернета'};
+  img.src=CU_BASE+p.p+'.webp';
+  const d=CU[cuState.k];let lab=p.t||'';
+  if(d.st&&p.s!=null&&!d.wheel)lab=(d.sl(p.s)+(lab?' · '+lab:''));
+  $('#cuSub').textContent=`Снимок ${cuState.i+1} из ${L.length}${lab?' · '+lab:''}`+(cuState.i===0&&(d.st||d.wheel)?' · ближайший к текущему положению':'');
+  $$('#cuThumbs .cuth').forEach((b,j)=>b.classList.toggle('on',j===cuState.i));
+  const cur=$('#cuThumbs .cuth.on');if(cur)cur.scrollIntoView({block:'nearest',inline:'center'});
+  $('#cuPrev').hidden=$('#cuNext').hidden=L.length<2;
+}
+function cuApply(){const img=$('#cuImg');if(img)img.style.transform=`translate(${cuState.x}px,${cuState.y}px) scale(${cuState.z})`}
+function cuZoom(f,cx,cy){
+  const v=$('#cuView').getBoundingClientRect();if(cx==null){cx=v.left+v.width/2;cy=v.top+v.height/2}
+  const z0=cuState.z,z=clamp(z0*f,1,8);const px=cx-v.left-v.width/2,py=cy-v.top-v.height/2;
+  cuState.x=px-(px-cuState.x)*z/z0;cuState.y=py-(py-cuState.y)*z/z0;cuState.z=z;if(z===1){cuState.x=cuState.y=0}cuApply();
+}
+function cuClose(){const m=$('#cuModal');if(m)m.hidden=true;document.body.style.overflow=''}
+function cuBind(){
+  $('#cuClose').onclick=cuClose;$('#cuPrev').onclick=()=>cuShow(cuState.i-1);$('#cuNext').onclick=()=>cuShow(cuState.i+1);
+  $('#cuZoomIn').onclick=()=>cuZoom(1.6);$('#cuZoomOut').onclick=()=>cuZoom(1/1.6);
+  $('#cuThumbs').addEventListener('click',e=>{const b=e.target.closest('.cuth');if(b)cuShow(+b.dataset.i)});
+  document.addEventListener('keydown',e=>{const m=$('#cuModal');if(!m||m.hidden)return;if(e.key==='Escape')cuClose();else if(e.key==='ArrowRight')cuShow(cuState.i+1);else if(e.key==='ArrowLeft')cuShow(cuState.i-1)});
+  const v=$('#cuView');const pts=new Map();let pinch=null,last=null,moved=false,tapT=0;
+  v.addEventListener('wheel',e=>{e.preventDefault();cuZoom(e.deltaY<0?1.2:1/1.2,e.clientX,e.clientY)},{passive:false});
+  v.addEventListener('pointerdown',e=>{if(e.target.closest('.cunav'))return;v.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});moved=false;
+    if(pts.size===2){const [a,b]=[...pts.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),z:cuState.z}}last={x:e.clientX,y:e.clientY}});
+  v.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===2&&pinch){const [a,b]=[...pts.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);cuZoom(pinch.z*d/pinch.d/cuState.z,(a.x+b.x)/2,(a.y+b.y)/2);moved=true;return}
+    if(last){const dx=e.clientX-last.x,dy=e.clientY-last.y;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;
+      if(cuState.z>1){cuState.x+=dx;cuState.y+=dy;cuApply()}last={x:e.clientX,y:e.clientY}}});
+  const up=e=>{const was=pts.has(e.pointerId);pts.delete(e.pointerId);if(pts.size<2)pinch=null;
+    if(was&&pts.size===0){if(!moved){const now=Date.now();if(now-tapT<320){cuZoom(cuState.z>1.5?1/cuState.z:3,e.clientX,e.clientY);tapT=0}else tapT=now}
+      else if(cuState.z===1&&last&&last.sx!=null){}
+      last=null}};
+  v.addEventListener('pointerup',up);v.addEventListener('pointercancel',up);
+  // свайп для листания при масштабе 1
+  let sw=null;v.addEventListener('pointerdown',e=>{sw={x:e.clientX,t:Date.now()}});
+  v.addEventListener('pointerup',e=>{if(sw&&cuState.z===1&&pts.size===0){const dx=e.clientX-sw.x;if(Math.abs(dx)>60&&Date.now()-sw.t<600)cuShow(cuState.i+(dx<0?1:-1))}sw=null});
+}
+function cuTarget(el){while(el&&el.id!=='scene'){if(el.id&&CU[el.id])return el.id;el=el.parentElement}return 'all'}
+function cuBindScene(){
+  const sv=$('#scene');if(sv.dataset.cu)return;sv.dataset.cu=1;
+  sv.addEventListener('contextmenu',e=>{e.preventDefault();cuOpen(cuTarget(e.target))});
+  let lp=null;
+  sv.addEventListener('pointerdown',e=>{
+    if(SC.cuMode){e.stopPropagation();e.preventDefault();SC.cuSup=true;cuOpen(cuTarget(e.target));return}
+    if(e.pointerType==='mouse')return;const k=cuTarget(e.target);if(CU_HOLD.has(k))return;
+    clearTimeout(lp&&lp.t);lp={x:e.clientX,y:e.clientY,k,t:setTimeout(()=>{SC.cuSup=true;cuOpen(k);lp=null},650)}},true);
+  sv.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>12){clearTimeout(lp.t);lp=null}},true);
+  ['pointerup','pointercancel'].forEach(ev=>sv.addEventListener(ev,()=>{if(lp){clearTimeout(lp.t);lp=null}},true));
+  sv.addEventListener('click',e=>{if(SC.cuSup){e.stopPropagation();e.preventDefault();SC.cuSup=false}},true);
+}
+
+$('#cuT').onclick=()=>{SC.cuMode=!SC.cuMode;press($('#cuT'),SC.cuMode);$('#scene').classList.toggle('cumode',SC.cuMode);$('#sceneTip').textContent=SC.cuMode?'Режим «Крупно»: нажмите на элемент — откроется его фотография. Нажмите «Крупно» ещё раз, чтобы вернуться к управлению.':''};
 /* ===== Манометр крупно ===== */
 let GZPOS={};try{GZPOS=JSON.parse(localStorage.getItem('ncpk-gzpos')||'{}')}catch(e){}
 let gzOpen=null,GZ=null,GZH=[],GZO={tgt:true,minmax:true,trend:true,lines:true,units:true};
@@ -2616,6 +2876,7 @@ function bindGestures(){
   const two=()=>{const [a,b]=[...P.values()];return {a,b,d:Math.hypot(b.x-a.x,b.y-a.y),ang:Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI,m:{x:(a.x+b.x)/2,y:(a.y+b.y)/2}}};
   const wrapD=d=>d>180?d-360:d<-180?d+360:d;
   w.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse'&&e.button!==0)return;
     P.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(P.size===1){
       const ctl=e.target.closest&&e.target.closest('[data-rot]');
@@ -2686,7 +2947,7 @@ function holdBtn(g,down,up){
 }
 function rpmStep(d){if(!S.can){log('Сначала включите управление оборотами (кнопка «вкл.»).','warn');return false}S.rpmSet=clamp(S.rpmSet+d,IDLE,RPM_MAX);return true}
 function bindScene(){
-  const sv=$('#scene');
+  const sv=$('#scene');cuBindScene();
   sv.querySelectorAll('.hit').forEach(g=>{
     g.addEventListener('pointerenter',()=>{$('#sceneTip').textContent=g.dataset.tip});
     g.addEventListener('focus',()=>{$('#sceneTip').textContent=g.dataset.tip});
@@ -2945,7 +3206,7 @@ syncTb();
 /* ===== Управление со схемы потоков ===== */
 (function(){
   const sch=$('#schem');if(!sch)return;
-  const TOG={vsTank:['#vTankBtn','sc_tank'],vsFt:['#foamTankValve','sc_ft'],vsEj:['#foamValve','sc_ej'],vsVac:['#vacValve','sc_vac'],vsDrain:['#drain','sc_drain'],vsHpDr:['#drain','sc_drain'],
+  const TOG={sDrSol:['#drain','sc_drain'],vsTank:['#vTankBtn','sc_tank'],vsFt:['#foamTankValve','sc_ft'],vsEj:['#foamValve','sc_ej'],vsVac:['#vacValve','sc_vac'],vsDrain:['#drain','sc_drain'],vsHpDr:['#drain','sc_drain'],
     sPump:['#clutch','sc_clutch'],sHpBox:['#hpOn','sc_hpOn']};
   const RNG={vsL0:['#out0','sc_w0','Вентиль напорный нормального давления — левая линия'],vsL1:['#out1','sc_w1','Вентиль напорный нормального давления — правая линия'],
     vsFill:['#fillv','sc_wf','Вентиль напорный подачи воды в цистерну'],vsHp:['#hpv','sc_hpv','Кран высокого давления'],vsDoz:[null,'sc_doz','Рукоятка дозатора «Подача насоса»']};
@@ -2965,6 +3226,8 @@ syncTb();
   Object.entries(TOG).forEach(([id,[btn]])=>{const el=document.getElementById(id);if(el)el.addEventListener('click',()=>{$(btn).click();auClick(id.startsWith('vs')?'lever':'button')})});
   document.getElementById('sVacPump')?.addEventListener('click',()=>{if(S.vacFault||S.vacPump)$('#vacStop').click();else{S.vacMode='auto';vacStartAuto()}});
   document.getElementById('sTankBox')?.addEventListener('click',()=>$('#capT').click());
+  {const e=document.getElementById('vsTankDr');if(e){e.classList.add('sclick');e.setAttribute('tabindex','0');e.addEventListener('click',()=>{S.tankDrain=!S.tankDrain;log(S.tankDrain?'Слив воды из цистерны включён.':'Слив воды из цистерны выключен.');auClick('lever')});
+    e.addEventListener('pointermove',ev=>{if(ev.pointerType==='mouse')showHoverTip('sc_tankDrain',ev.clientX,ev.clientY)});e.addEventListener('pointerleave',()=>hideHoverTip())}}
   document.getElementById('sSrcBox')?.addEventListener('click',()=>{if(S.src==='hydrant')$('#hydOpen').click();else log('Источник воды выбирается в блоке «Водоисточник»: «Гидрант» можно подключить прямо во время работы.')});
   Object.entries(HOLD).forEach(([id,[k]])=>{const el=document.getElementById(id);if(!el)return;holdBtn(el,()=>{S[k]=true},()=>{S[k]=false})});
   // поповер-регулятор для вентилей и дозатора
