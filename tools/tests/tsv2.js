@@ -1,0 +1,11 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
+const p=await b.newPage({viewport:{width:1400,height:1000},deviceScaleFactor:1.5});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file://'+process.cwd()+'/test.html');await p.waitForTimeout(600);
+const shot=async n=>{const el=await p.$('#schem');await el.scrollIntoViewIfNeeded();await p.waitForTimeout(400);await el.screenshot({path:n})};
+await shot('sc_a.png');
+await p.evaluate(()=>{const T=window.__T,S=T.S;Object.assign(S,{brake:true,kom:true,gear:'5',power:true,clutch:true,clutchT:10,can:true,rpmSet:1700,rpm:1700,pumpRpm:2000,fill:1,buPower:true,foamValve:true,foamTankValve:true,doz:0.4});S.v.tank=true;S.v.out=[1,0.5];for(let i=0;i<30;i++)T.step(0.1)});
+await shot('sc_b.png');
+await p.evaluate(()=>{const T=window.__T,S=T.S;Object.assign(S,{clutch:false,pumpRpm:0,purge:true,reel:true,tankDrain:true,foamValve:false,foamTankValve:false,doz:0});S.v.drain=true;S.v.vacValve=true;S.vacPump=true;for(let i=0;i<10;i++)T.step(0.1)});
+await shot('sc_c.png');
+console.log(errs);await b.close()})();

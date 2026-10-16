@@ -1,0 +1,11 @@
+# результаты сборки
+android/assets/
+android/build/
+*.apk.idsig
+# ключ подписи — только в секретах GitHub и у владельца
+*.jks
+*.keystore
+# тесты
+tools/tests/test.html
+node_modules/
+__pycache__/

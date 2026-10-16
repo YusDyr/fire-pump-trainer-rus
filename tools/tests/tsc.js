@@ -1,0 +1,18 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
+const p=await b.newPage({viewport:{width:1400,height:1000}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file://'+process.cwd()+'/test.html');await p.waitForTimeout(500);
+await p.click('#viewSeg button[data-view=panel]');await p.waitForTimeout(300);
+await p.evaluate(()=>document.querySelector('.schem').scrollIntoView());await p.waitForTimeout(200);
+const r={};
+await p.click('#vsTank');r.tank=await p.evaluate(()=>__T.S.v.tank);
+await p.click('#vsVac');r.vac=await p.evaluate(()=>__T.S.v.vacValve);
+await p.click('#vsL0');await p.waitForTimeout(100);
+const rg=await p.$('#schPop input');const bb=await rg.boundingBox();await p.mouse.click(bb.x+bb.width*0.5,bb.y+bb.height/2);await p.waitForTimeout(100);
+r.l0=await p.evaluate(()=>__T.S.v.out[0].toFixed(2));
+await p.click('#schPop [data-sp="1"]');await p.waitForTimeout(1800);r.l0b=await p.evaluate(()=>__T.S.v.out[0].toFixed(2));
+await p.screenshot({path:'s_scpop.png'});
+await p.mouse.click(5,5);await p.waitForTimeout(100);r.popHidden=await p.evaluate(()=>document.getElementById('schPop').hidden);
+await p.hover('#vsFt');await p.mouse.move((await (await p.$('#vsFt')).boundingBox()).x+5,(await (await p.$('#vsFt')).boundingBox()).y+5);await p.waitForTimeout(100);r.tip=await p.evaluate(()=>document.getElementById('hoverTip')?.innerText);
+const pb=await (await p.$('#sPurge')).boundingBox();await p.mouse.move(pb.x+5,pb.y+5);await p.mouse.down();await p.waitForTimeout(100);r.purge=await p.evaluate(()=>__T.S.purge);await p.mouse.up();
+console.log(JSON.stringify(r),errs);await b.close()})();

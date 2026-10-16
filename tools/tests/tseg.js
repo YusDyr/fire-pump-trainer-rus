@@ -1,0 +1,14 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
+const p=await b.newPage({viewport:{width:1400,height:1000}});const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').slice(0,300)));
+await p.goto('file://'+process.cwd()+'/test.html');await p.waitForTimeout(800);
+const shot=async(n)=>{await p.evaluate(()=>{const sv=document.getElementById('scene');sv.setAttribute('viewBox','1105 1040 95 52');});await p.waitForTimeout(300);
+  await (await p.$('#scene')).screenshot({path:n});await p.evaluate(()=>document.getElementById('scene').setAttribute('viewBox','0 0 2486 1960'))};
+await shot('seg0.png');
+await p.evaluate(()=>{window.__T.S.buPower=true});
+await p.evaluate(()=>{const T=window.__T;T.S.pumpRpm=2734;for(let i=0;i<3;i++)T.step(0.2)});await p.waitForTimeout(700);
+console.log(await p.evaluate(()=>[...document.querySelectorAll('.sg.on')].map(e=>e.id).join(' ')));
+await shot('seg1.png');
+await p.evaluate(()=>{window.__T.S.pumpRpm=0;});const bb=await (await p.$('#sc_tachoH .ring')).boundingBox();await p.mouse.click(bb.x+bb.width/2,bb.y+bb.height/2);await p.evaluate(()=>window.__T.step(0.5));await p.waitForTimeout(500);
+await shot('seg2.png');console.log(await p.evaluate(()=>[...document.querySelectorAll('.sg.on')].map(e=>e.id).join(' ')));const bb2=await (await p.$('#sc_tachoRpm .ring')).boundingBox();await p.mouse.click(bb2.x+bb2.width/2,bb2.y+bb2.height/2);await p.evaluate(()=>window.__T.step(0.5));await p.waitForTimeout(500);await shot('seg3.png');
+console.log(errs);await b.close()})();

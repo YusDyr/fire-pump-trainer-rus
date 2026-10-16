@@ -1,6 +1,7 @@
 name: Release
-# Новый релиз создаётся автоматически, когда в main меняется файл VERSION.
-# Тег vX.Y, заметки из раздела «## X.Y» в CHANGELOG.md, к релизу прикладываются APK и HTML.
+# Релиз запускается, когда в main меняется файл VERSION (раздел «## X.Y» в CHANGELOG.md обязателен).
+# Сборка из исходников: src/emulator.html → emulator/index.html (сайт), APK, лендинг;
+# результаты коммитятся обратно в main, затем создаётся релиз vX.Y с APK и HTML.
 on:
   push:
     branches: [main]
@@ -8,18 +9,50 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency: { group: release, cancel-in-progress: false }
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
       - name: Prepare
         id: prep
         run: |
           V="$(tr -d ' \n\r' < VERSION)"
           echo "v=$V" >> "$GITHUB_OUTPUT"
-          awk -v v="$V" '$0 ~ "^## "v" " {f=1; next} /^## / && f {exit} f' CHANGELOG.md > notes.md
-          [ -s notes.md ] || echo "Версия $V" > notes.md
+          awk -v v="$V" '$0 ~ "^## "v" " {f=1; next} /^## / && f {exit} f' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          [ -s "$RUNNER_TEMP/notes.md" ] || { echo "::error::В CHANGELOG.md нет раздела «## $V …»"; exit 1; }
+      - name: Android SDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-34" "build-tools;34.0.0" >/dev/null
+          echo "ANDROID_JAR=$ANDROID_HOME/platforms/android-34/android.jar" >> "$GITHUB_ENV"
+          echo "BUILD_TOOLS=$ANDROID_HOME/build-tools/34.0.0" >> "$GITHUB_ENV"
+      - name: Web build
+        run: python3 tools/build.py "${{ steps.prep.outputs.v }}"
+      - name: APK
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          [ -n "$KEYSTORE_B64" ] || { echo "::error::Не задан секрет ANDROID_KEYSTORE_B64 (см. DEVELOPMENT.md)"; exit 1; }
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          KEYSTORE="$RUNNER_TEMP/release.jks" bash tools/build_apk.sh
+          rm -f "$RUNNER_TEMP/release.jks"
+      - name: Landing
+        run: python3 tools/make_landing.py .
+      - name: Commit build results
+        run: |
+          V="${{ steps.prep.outputs.v }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add emulator/index.html emulator/fonts NCPK-emulator.apk index.html android/AndroidManifest.xml
+          if git diff --cached --quiet; then echo "Нечего коммитить"; else
+            git commit -m "Сборка версии $V [skip ci]"
+            git push origin HEAD:main
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
           cp NCPK-emulator.apk "NCPK-emulator-$V.apk"
           cp emulator/index.html "NCPK-emulator-$V.html"
       - name: Create GitHub release
@@ -29,8 +62,8 @@ jobs:
           V="${{ steps.prep.outputs.v }}"
           if gh release view "v$V" >/dev/null 2>&1; then
             gh release upload "v$V" "NCPK-emulator-$V.apk" "NCPK-emulator-$V.html" --clobber
-            gh release edit "v$V" --notes-file notes.md
+            gh release edit "v$V" --notes-file "$RUNNER_TEMP/notes.md"
           else
             gh release create "v$V" "NCPK-emulator-$V.apk" "NCPK-emulator-$V.html" \
-              --target "$GITHUB_SHA" --title "Версия $V" --notes-file notes.md --latest
+              --target "$sha" --title "Версия $V" --notes-file "$RUNNER_TEMP/notes.md" --latest
           fi

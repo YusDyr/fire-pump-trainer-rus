@@ -1,0 +1,15 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
+const ctx=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,isMobile:true,hasTouch:true});
+const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file://'+process.cwd()+'/'+process.argv[2]);await p.waitForTimeout(700);
+await p.evaluate(()=>document.querySelector('.scenewrap').scrollIntoView());await p.waitForTimeout(200);
+const cdp=await ctx.newCDPSession(p);const bb=await (await p.$('#scene')).boundingBox();
+const touch=async(type,pts)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:pts.map((q,i)=>({x:q.x,y:q.y,id:i}))});
+const m={x:bb.x+bb.width*0.05,y:bb.y+bb.height*0.5};
+await touch('touchStart',[{x:m.x,y:m.y-15}]);await touch('touchStart',[{x:m.x,y:m.y-15},{x:m.x,y:m.y+15}]);
+for(let d=15;d<=70;d+=5){await touch('touchMove',[{x:m.x,y:m.y-d},{x:m.x,y:m.y+d}]);await p.waitForTimeout(10)}await touch('touchEnd',[]);
+const z=await p.evaluate(()=>[__T.ZM.z.toFixed(2),__T.ZM.tx.toFixed(0),__T.ZM.ty.toFixed(0)]);
+await p.evaluate(()=>{const s=document.querySelector('.scenewrap');const r=s.getBoundingClientRect();s.dispatchEvent(new WheelEvent('wheel',{deltaY:-100,ctrlKey:true,clientX:r.left+100,clientY:r.top+100,bubbles:true,cancelable:true}))});
+const z2=await p.evaluate(()=>__T.ZM.z.toFixed(2));
+console.log(process.argv[2],z,z2,errs);await b.close()})();
