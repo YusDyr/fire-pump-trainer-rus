@@ -11,16 +11,17 @@ os.makedirs(OUT, exist_ok=True)
 LOG=open(os.path.join(OUT,'log%s.txt'%('_cut' if CUT else '')),'w',encoding='utf-8')
 def print(*a):
     LOG.write(' '.join(map(str,a))+'\n'); LOG.flush()
-name = 'NCPK_stupen_ND_razrez' if CUT else 'NCPK_stupen_ND'
+name = 'NCPK_nasos_razrez' if CUT else 'NCPK_nasos'
 doc = App.newDocument(name)
-doc.Label = 'НЦПК-40/100-4/400 — ступень НД' + (' (разрез ¾)' if CUT else '')
+doc.Label = 'НЦПК-40/100-4/400 — ступени НД и ВД' + (' (разрез)' if CUT else '')
 
 def xmm(px): return (px - P.X0) / P.S
 
 grp = {}
-for g in ['Проточная часть', 'Вал и опоры', 'Привод ступени ВД', 'Уплотнение вала', 'Корпусные детали', 'Тахометр', 'Подложка']:
+for g in ['Проточная часть', 'Вал и опоры', 'Привод ступени ВД', 'Уплотнение вала', 'Корпусные детали', 'Тахометр', 'Ступень ВД', 'Подложка']:
     grp[g] = doc.addObject('App::DocumentObjectGroup', 'G%d' % len(grp)); grp[g].Label = g
 def group_of(label):
+    if label.startswith('ВД '): return 'Ступень ВД'
     n = label.split(' ')[0]
     m = {'Проточная часть': ['11','12','13','14','Напорный','Гайка'],
          'Вал и опоры': ['Вал','1','3','4','9','25','26','Гайка'],
@@ -35,7 +36,7 @@ def group_of(label):
 
 cutter = None
 if CUT:  # вырезаем четверть: x любой, y<0, z>0 (смотрим спереди — видно внутренность)
-    cutter = Part.makeBox(2000, 1000, 1000, V(-500, -1000, 0))
+    cutter = Part.makeBox(2000, 999.7, 1000, V(-500, -1000, 0.37))
 
 def color(obj, c, tr=0):
     if App.GuiUp:
@@ -71,11 +72,15 @@ def rev_body(nm, label, c, tr, poly):
     return body
 
 for nm, label, c, tr, poly in P.REV:
+    if nm == 'Kryshka_12': continue
     rev_body(nm, label, c, tr, poly)
 doc.recompute()
 
-def feat(nm, label, shape, c, tr=0):
-    if CUT: shape = shape.cut(cutter)
+hpcutter = Part.makeBox(2000, 600, 600, V(-500, -600, 55.0)) if CUT else None
+def feat(nm, label, shape, c, tr=0, precut=False):
+    if CUT and not precut:
+        shape = shape.cut(hpcutter if label.startswith('ВД ') else cutter)
+        if shape.isNull() or not shape.Solids: return None
     o = doc.addObject('Part::Feature', nm); o.Label = label; o.Shape = shape
     finish(o, label, c, tr); return o
 
@@ -83,6 +88,16 @@ def revolve_xy(poly_mm):
     pts = [V(x, r, 0) for x, r in poly_mm]
     f = Part.Face(Part.makePolygon(pts + [pts[0]])); f.rotate(V(0,0,0), V(1,0,0), 90)
     return f.revolve(V(0,0,0), V(1,0,0), 360)
+
+import asym
+feat('Korpus_nasosa_20', '20 Корпус насоса (улитка, напорный патрубок, приливы)', asym.casing(cutter), (0.55,0.6,0.66), precut=True)
+_cv = [p for p in P.REV if p[0] == 'Kryshka_12'][0]
+feat('Kryshka_12', _cv[1], asym.cover_extra(revolve_xy([(xmm(x), r) for x, r in _cv[4]])), _cv[2])
+_b, _s = asym.fasteners()
+feat('Bolty_kryshki', 'Болты крышки M12 (8 шт.)', _b, (0.35,0.36,0.4))
+feat('Shpilki_vsasyvaniya', 'Шпильки фланца всасывания M16 (6 шт.)', _s, (0.35,0.36,0.4))
+feat('Kran_slivnoy_16', '16 Кран сливной', asym.drain_valve(), (0.75,0.6,0.2))
+feat('Shchup', 'Щуп/сапун (условно)', Part.makeCylinder(3, 36, V(xmm(1080), 0, 64), V(0,0,1)).fuse(Part.makeCylinder(8, 5, V(xmm(1080), 0, 100), V(0,0,1))), (0.3,0.3,0.32))
 
 # Лопатки
 B = P.BLADES
@@ -135,7 +150,10 @@ for nm, label, c, xpx, r0, r1, rad, sd in P.RADIAL:
         sh = Part.makeCylinder(rad, r1 - r0, base, V(0,0,sd))
     feat(nm, label, sh, c)
 F = P.FORK
-feat(F['name'], F['label'], Part.makeCylinder(F['r'], F['L'], V(xmm(F['x']), -F['L']/2, F['z']), V(0,1,0)), F['color'])
+feat(F['name'], F['label'], Part.makeCylinder(F['r'], F['L'], V(xmm(F['x']), -55, F['z']), V(0,1,0)), F['color'])
+import hp
+for _n, _l, _s, _c in hp.build():
+    feat(_n, _l, _s, _c)
 
 # Подложка: рис. 2 в масштабе, в плоскости XZ, за моделью
 img = os.path.join(HERE, 'ris2_stupen_ND.png')
