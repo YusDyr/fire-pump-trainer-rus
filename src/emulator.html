@@ -43,6 +43,7 @@ header.top>*{min-width:0;max-width:100%}.toolbar>*{min-width:0;max-width:100%}.t
 .seg button{border:0;background:transparent;padding:6px 10px;cursor:pointer;font-size:13px}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .btn{border:1px solid var(--line);background:var(--plate);border-radius:6px;padding:6px 11px;cursor:pointer;box-shadow:var(--groove);font-size:13px}
+a.btn{color:var(--ink);text-decoration:none;display:inline-block}
 .btn:hover{border-color:var(--muted)}
 .btn.primary{background:var(--signal);border-color:var(--signal);color:var(--signal-ink)}
 select{border:1px solid var(--line);background:var(--plate);border-radius:6px;padding:6px 8px;max-width:100%}
@@ -336,6 +337,7 @@ body.lesson-on .grid .panel:not(.focuspanel):hover,body.lesson-on .scenerow .pan
     <button class="btn" id="seasonT" aria-pressed="false" title="Сезон: меняет температуру и порядок работы">☀️ Лето</button>
     <button class="btn" id="sound" aria-pressed="false">🔇 Звук выкл.</button>
     <button class="btn" id="vibT" aria-pressed="true" hidden>📳 Вибро</button>
+    <a class="btn" id="deviceLink" href="ustroystvo.html?from=emu" target="_blank" rel="noopener" title="Разрезы ступеней НД и ВД по РЭ и 3D-модель насоса">⚙️ Устройство насоса</a>
     <span class="mono sub" id="clock">00:00</span>
   </div>
 </header>
@@ -3185,3 +3187,10 @@ setInterval(()=>{
 },100);
 })();
 </script>
+<script>
+// «Устройство насоса»: рядом лежит ustroystvo.html (сайт, APK); в отдельном файле или артефакте — ссылка на сайт
+(function(){var a=document.getElementById('deviceLink');if(!a)return;var h=location.hostname;
+  if(location.protocol==='file:'&&/android_asset/.test(location.href)){a.removeAttribute('target');return}
+  if(!/github\.io$/.test(h)&&h!=='localhost'&&h!=='127.0.0.1')a.href='https://yusdyr.github.io/fire-pump-trainer-rus/emulator/ustroystvo.html';})();
+</script>
+

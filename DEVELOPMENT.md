@@ -5,7 +5,9 @@
 | Путь | Что это |
 |---|---|
 | `src/emulator.html` | **Исходник эмулятора** — один HTML-файл (разметка, стили, логика, базовое фото отсека и анимации внутри). Правки делаются здесь. |
-| `emulator/` | Собранная веб-версия для GitHub Pages: `index.html`, `fonts/`, `photos/` (крупные планы). `index.html` и `fonts/` пишет сборка, руками не править. `photos/` — исходные фото крупных планов (`*.webp` 2600 px и миниатюры `t/`). |
+| `src/ustroystvo/` | **Страница «Устройство насоса»**: анимированные разрезы ступеней НД (рис. 2) и ВД (рис. 5) по РЭ и 3D-модель насоса (three.js r147, без сети). `template.html` — код страницы; `*_ink.webp` / `*_mask.webp` — чертёж и маска областей (R — вода, G — масло, B: 255 — вал, 120 — охлаждение); `*_data.json` — пути частиц и координаты деталей; `model.json` + `model.bin` — модель из `cad/model/NCPK_nasos.glb` (координаты uint16, нормали int8). Собирается в `emulator/ustroystvo.html` и в APK, из эмулятора — кнопка «Устройство насоса». |
+| `tools/make_ustroystvo.py` | Склеивает страницу «Устройство насоса» в один HTML (`python3 tools/make_ustroystvo.py out.html`); вызывается из `build.py`. |
+| `emulator/` | Собранная веб-версия для GitHub Pages: `index.html`, `fonts/`, `photos/` (крупные планы). `index.html`, `ustroystvo.html` и `fonts/` пишет сборка, руками не править. `photos/` — исходные фото крупных планов (`*.webp` 2600 px и миниатюры `t/`). |
 | `android/` | Обёртка APK: `AndroidManifest.xml`, `src/` (WebView), `res/` (иконки), `fonts/` + `fonts.css` (локальные шрифты), `icon512.png`. Каталоги `assets/` и `build/` создаются при сборке. |
 | `tools/build.py` | Собирает `emulator/index.html` и `android/assets/` из `src/emulator.html`, ставит версию. |
 | `tools/build_apk.sh` | Собирает и подписывает APK (aapt, javac, d8, zipalign, apksigner). |

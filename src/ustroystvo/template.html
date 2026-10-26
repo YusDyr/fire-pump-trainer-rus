@@ -1,0 +1,593 @@
+<title>Устройство насоса НЦПК</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Три вкладки: разрез ступени НД (рис. 2), разрез ступени ВД (рис. 5), 3D-модель. Пульт и легенда общие. */
+:root{
+  --bg:#e9edf0; --paper:#fbfcfd; --ink:#1b2530; --muted:#5b6874; --line:#cdd5dc;
+  --water:#2e86d1; --water-d:#0d4f8c; --oil:#d99a17; --steel:#8b97a3; --steel-hi:#e9eef3;
+  --cool:#c04fc4; --accent:#c8352b; --hp:#e46a1c; --ok:#2f8f55; --scene:#dfe5ea;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10161b; --paper:#172028; --ink:#d5dee6; --muted:#8c99a5; --line:#2a3640;
+  --water:#3d9be6; --water-d:#9fd2ff; --oil:#e5a93a; --steel:#6f7d8a; --steel-hi:#c7d2dc;
+  --cool:#e07ae4; --accent:#ff5b4c; --hp:#ff8a3d; --ok:#4cc27c; --scene:#1b252e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10161b; --paper:#172028; --ink:#d5dee6; --muted:#8c99a5; --line:#2a3640;
+  --water:#3d9be6; --water-d:#9fd2ff; --oil:#e5a93a; --steel:#6f7d8a; --steel-hi:#c7d2dc;
+  --cool:#e07ae4; --accent:#ff5b4c; --hp:#ff8a3d; --ok:#4cc27c; --scene:#1b252e; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px}
+h1{font-size:clamp(20px,3vw,26px);margin:0;font-weight:700;text-wrap:balance;letter-spacing:-.01em}
+.src{color:var(--muted);font-size:13px}
+.back{font-size:14px;color:var(--water-d);text-decoration:none}
+.back:hover{text-decoration:underline}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;padding:8px 12px 7px;font-weight:600;color:var(--muted);white-space:nowrap;background:none}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);background:none}
+.stage{background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;position:relative}
+.scroller{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+.scroller.zoomed canvas{width:200%}
+#cv{display:block;width:100%;height:auto;touch-action:pan-x pan-y}
+#v3{position:relative;background:var(--scene);height:clamp(320px,62vw,620px)}
+#v3 canvas{display:block;width:100%;height:100%;touch-action:none}
+.v3hint{position:absolute;left:10px;top:8px;font-size:12.5px;color:var(--muted);pointer-events:none}
+.v3msg{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:14px;text-align:center;padding:20px}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font-size:13px;padding:4px 8px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-130%);opacity:0;transition:opacity .12s}
+.tip.on{opacity:1}
+.zoomBtn{position:absolute;right:10px;bottom:10px;z-index:2;background:var(--paper)}
+.bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rng{display:flex;align-items:center;gap:10px;flex:1 1 260px;min-width:0}
+.rng input{flex:1;min-width:0;accent-color:var(--water)}
+.rng output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;min-width:7.5em;text-align:right;font-size:14px}
+.lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+button{font:inherit;font-size:14px;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;display:inline-flex;gap:7px;align-items:center}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+#hp[aria-pressed="true"]{background:var(--hp);border-color:var(--hp);color:#fff}
+.sw{width:10px;height:10px;border-radius:50%;display:inline-block}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:14px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.card h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.grp{margin:0 0 10px}
+.grp b{display:block;font-size:13px;font-weight:600;margin:6px 0 4px}
+.parts{display:flex;flex-wrap:wrap;gap:5px}
+.parts button{border-radius:6px;padding:3px 8px;font-size:13px;text-align:left}
+.parts button .n{font-family:var(--f-mono);font-weight:600;color:var(--accent)}
+.parts button[aria-pressed="true"] .n{color:var(--paper)}
+#det h3{margin:0 0 4px;font-size:18px}
+#det .num{font-family:var(--f-mono);color:var(--accent);margin-right:6px}
+#det p{margin:8px 0;max-width:68ch}
+blockquote{margin:10px 0;padding:8px 12px;border-left:3px solid var(--line);background:color-mix(in srgb,var(--bg) 55%,transparent);border-radius:0 6px 6px 0;max-width:68ch}
+blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:12.5px;margin-top:4px}
+.how p{margin:6px 0;max-width:72ch}
+.key{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin-top:8px}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.note{font-size:12.5px;color:var(--muted)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.tip{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Устройство насоса НЦПК-40/100-4/400</h1>
+    <a class="back" id="back" href="index.html" hidden>← к эмулятору</a>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Вид">
+    <button role="tab" data-tab="nd" aria-selected="true">Ступень НД · рис. 2</button>
+    <button role="tab" data-tab="hp" aria-selected="false">Ступень ВД · рис. 5</button>
+    <button role="tab" data-tab="m3" aria-selected="false">3D-модель</button>
+  </div>
+
+  <div class="stage" id="st2">
+    <button class="zoomBtn" id="zoom" aria-pressed="false" title="Увеличить чертёж">Крупнее</button>
+    <div class="scroller" id="scroller">
+      <canvas id="cv" role="img" aria-label="Разрез насоса с анимацией воды, масла и вращения вала"></canvas>
+    </div>
+    <div class="tip" id="tip"></div>
+  </div>
+  <div class="stage" id="st3" hidden>
+    <div id="v3"><div class="v3msg" id="v3msg">Загрузка 3D-модели…</div><div class="v3hint">Вращать — одним пальцем, приблизить — двумя. Нажмите на деталь.</div></div>
+  </div>
+
+  <div class="bar">
+    <div class="rng">
+      <span class="lbl">Вал НД</span>
+      <input type="range" id="rpm" min="0" max="2700" step="50" value="1500" aria-label="Частота вращения вала насоса, об/мин">
+      <output id="rpmOut" for="rpm">1 500 об/мин</output>
+    </div>
+    <div class="chips">
+      <button id="hp" aria-pressed="false" title="Рукоятка включения привода ступени ВД вниз — муфта 5 включает редуктор">Ступень ВД</button>
+      <button id="play" aria-pressed="false">Пауза</button>
+    </div>
+    <div class="chips" role="group" aria-label="Слои" id="layers2"></div>
+  </div>
+  <div class="bar" id="bar3" hidden>
+    <div class="rng">
+      <span class="lbl">Разрез</span>
+      <input type="range" id="cut" min="0" max="100" step="1" value="50" aria-label="Положение секущей плоскости">
+      <output id="cutOut" for="cut">по осям</output>
+    </div>
+    <div class="rng">
+      <span class="lbl">Разборка</span>
+      <input type="range" id="exp" min="0" max="100" step="1" value="0" aria-label="Разнести детали">
+      <output id="expOut" for="exp">собран</output>
+    </div>
+    <div class="chips">
+      <button id="glass" aria-pressed="false">Прозрачный корпус</button>
+      <button id="w3" aria-pressed="true"><span class="sw" style="background:var(--water)"></span>Вода</button>
+      <button id="home3">Исходный вид</button>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h2 id="legT">Детали</h2>
+      <div id="groups"></div>
+      <p class="note" id="legN">Нажмите номер или деталь на чертеже.</p>
+    </div>
+    <div class="card" id="det" aria-live="polite"></div>
+  </div>
+
+  <div class="card how" id="how"></div>
+</div>
+
+<script>__THREE__</script>
+<script>
+const FIG={
+ nd:{IW:2272,IH:1809,ink:"data:image/webp;base64,__ND_INK__",mask:"data:image/webp;base64,__ND_MASK__",D:__ND_DATA__},
+ hp:{IW:1640,IH:1450,ink:"data:image/webp;base64,__HP_INK__",mask:"data:image/webp;base64,__HP_MASK__",D:__HP_DATA__}
+};
+const MODEL=__MODEL_JSON__;
+const MODEL_BIN="__MODEL_BIN__";
+
+const Q=(t,c)=>({t,c});
+const RE32="РЭ насоса, п. 3.2", RE33="РЭ насоса, п. 3.3";
+const QHP=Q("Ступень высокого давления представляет собой центробежный двухступенчатый насос консольного типа со встречно расположенными рабочими колесами и отводящими устройствами лопаточного типа (направляющими аппаратами).",RE33);
+const QDRIVE=Q("Привод ступени высокого давления осуществляется от вала ступени нормального давления через многодисковую фрикционную муфту и повышающий редуктор с передаточным отношением 2,33.",RE33);
+const QOIL=Q("Смазка редуктора и опорных подшипников насосов нормального и высокого давления осуществляется из масляной ванны, уровень масла в которой контролируется с помощью щупа.",RE33);
+const QHEAT=Q("Ввиду высокой частоты вращения вала ступени ( до 6300 об/мин.) подшипники и вал-шестерня могут сильно нагреваться.",RE33);
+const QCOOL=Q("Охлаждение вала-шестерни также обеспечивается водой, которая прокачивается через полый вал за счет разности давлений между выходом и входом ступени насоса высокого давления.",RE33);
+const QREAR=Q("Для охлаждения задней опоры вала через корпус 3 подшипника пропускается вода, которая поступает по трубопроводу с выхода ступени нормального давления и сбрасывается затем на вход той же ступени.",RE33);
+const QDROPS=Q("В конце обкатки выделения из дренажных отверстий должны быть в виде отдельных капель в количестве не более 60 капель в минуту.","РЭ насоса, п. 8.3.4");
+
+const META={
+ nd:{title:"Ступень нормального давления",src:"Основа — рис. 2 РЭ насоса",
+  layers:[["water","Вода","--water"],["oil","Масло","--oil"],["shaft","Вал","--steel"]],
+  groups:[["Проточная часть",[12,13,14,11,16,17]],["Вал и опоры",[1,3,4,9,21,22,23,25,26,27,28]],["Привод ступени ВД",[5,6,7,8,19]],["Уплотнение вала",[15,10]],["Корпус и масло",[20,18]],["Тахометр",[2,24]]],
+  sel:14,
+  how:`<h2>Что показано</h2>
+  <p>Вода входит справа через сетку 13 в крышку 12, попадает в центр рабочего колеса 14 и отбрасывается лопатками к периферии, в спиральный отвод корпуса. Оттуда она уходит в напорный патрубок и дальше к коллектору с вентилями.</p>
+  <p>Вал опирается на подшипники 3, 4 и 9, которые работают в масляной ванне корпуса. Между колесом и опорами стоит сальниковое уплотнение 15: через дренажное отверстие из него должны выходить отдельные капли. Муфта 5 на валу включает привод ступени высокого давления.</p>
+  <div class="key"><span><span class="sw" style="background:var(--water)"></span>вода</span><span><span class="sw" style="background:var(--oil)"></span>масло в картере</span><span><span class="sw" style="background:var(--steel)"></span>вал</span><span><span class="sw" style="background:var(--hp)"></span>муфта ступени ВД включена</span></div>
+  <p class="note">Движение замедлено, уровень масла показан условно. Цвета добавлены поверх чертежа из РЭ, геометрия не менялась.</p>`,
+  info:{
+ 14:{p:"Колесо закреплено на конце вала консольно. Вода приходит в его центр вдоль оси и выходит по каналам между дисками к периферии.",
+     q:[Q("Ступень нормального давления представляет собой центробежный одноступенчатый насос консольного типа с осевым подводом, выполненным в крышке 12, и спиральным отводом, выполненным в корпусе 20.",RE32),Q("Уплотнения рабочего колеса - щелевого типа.",RE32)]},
+ 12:{p:"В крышке выполнен осевой подвод воды к колесу. К ней присоединяется всасывающий патрубок.",q:[Q("…с осевым подводом, выполненным в крышке 12…",RE32)]},
+ 13:{p:"Сетка на входе в крышку задерживает крупный мусор перед колесом."},
+ 16:{p:"Шаровой кран для слива воды из корпуса ступени НД."},
+ 20:{p:"Корпус несёт спиральный отвод и опоры вала. В нижней части корпуса — масляная ванна для подшипников и муфты.",
+     q:[QOIL,Q("Уровень масла должен быть между рисками на щупе","РЭ насоса, табл. 4, п. 1.3")]},
+ 18:{p:"Через пробку внизу корпуса сливают масло из ванны.",
+     q:[Q("Слить отработанное масло через отверстие в нижней части корпуса, закрытое пробкой. Залить новое масло через отверстие в корпусе, закрытое щупом, до уровня верхней риски щупа","РЭ насоса, табл. 4, п. 3.2 (ТО-2)"),Q("Масло трансмиссионное ТАД-17И или ТАД-15П ГОСТ 23652-79","РЭ насоса, табл. 5")]},
+ 3:{p:"Шарикоподшипник 307 со стороны полумуфты, смазывается из масляной ванны.",q:[QOIL]},
+ 4:{p:"Радиально-упорный подшипник 7000108 рядом с подшипником 307."},
+ 9:{p:"Шарикоподшипник 309 — опора вала со стороны рабочего колеса, тоже в масляной ванне."},
+ 5:{p:"Многодисковая муфта на валу. При включении она передаёт вращение на редуктор ступени ВД. Диски работают в масле.",
+    q:[QDRIVE,Q("Регулирование фрикционной муфты привода ступени высокого давления заключается в обеспечении требуемого передаваемого момента 16…18 кгс ·м","РЭ насоса, п. 8.2")]},
+ 6:{p:"Гайкой настраивают момент, который передаёт муфта.",q:[Q("Регулирование передаваемого муфтой момента производится гайкой 4 через специальное окно в корпусе ступени нормального давления, закрытое крышкой 5.","РЭ насоса, п. 3.5 (позиции по рис. 8)")]},
+ 7:{p:"Стопорные болты фиксируют регулировочную гайку.",q:[Q("Стопорение гайки производится 3-мя болтами 3.","РЭ насоса, п. 3.5 (позиции по рис. 8)")]},
+ 8:{p:"Вилка механизма включения муфты. Её поворачивает рукоятка 13 на рис. 1 (рукоятка включения привода ступени высокого давления)."},
+ 19:{p:"Втулка нажимная в механизме включения муфты."},
+ 15:{p:"Набор колец из набивки, поджатых нажимной втулкой. Небольшая утечка через дренажное отверстие нужна для смазки и охлаждения колец.",
+     q:[Q("Уплотнение вала обеспечивается сальниковым уплотнением, состоящим из набора уплотнительных колец (рис.3), поджимаемых в осевом направлении нажимным кольцом.",RE32),QDROPS]},
+ 26:{p:"Манжета на выходе вала со стороны полумуфты держит масло в корпусе.",q:[Q("16. Большой расход масла в масляной ванне редуктора — 1. Износ уплотнительных манжет — 1. Заменить манжеты","РЭ насоса, табл. 3")]},
+ 1:{p:"Полумуфта на конце вала. К ней крепится карданный вал от КОМ.",q:[Q("…закрепить за полумуфту приводного вала или за карданный вал какой-нибудь подходящий рычаг и с помощью динамометра определить…","РЭ насоса, п. 8.2 в")]},
+ 2:{p:"Датчик считывает зубцы ротора 24. По его сигналу блок на БУК показывает обороты и наработку.",q:[Q("Тахометр 6 (рис.1) предназначен для измерения скорости вращения вала насоса и времени наработки насоса…","РЭ насоса, п. 3.10")]},
+ 24:{p:"Зубчатый ротор на валу, по которому работает датчик тахометра 2."},
+ 25:{p:"Корпус задней опоры вала со стороны привода."}
+ }},
+ hp:{title:"Ступень высокого давления",src:"Основа — рис. 5 РЭ насоса, разрез А-А",
+  layers:[["water","Вода","--water"],["cool","Охлаждение","--cool"],["oil","Масло","--oil"],["shaft","Вал","--steel"]],
+  groups:[["Проточная часть",[14,18,17,16,15,19,9,13]],["Вал-шестерня и опоры",[4,1,3,5,30,31,10,11,12,27,28,29,2]],["Редуктор",[23,24,25,22,26]],["Уплотнение вала",[21,6,7,8,20]]],
+  sel:4,
+  how:`<h2>Что показано</h2>
+  <p>Ступень ВД включена последовательно со ступенью НД: вода из напорного коллектора НД по патрубку 29 (рис. 1) приходит в верхний патрубок корпуса 14, проходит оба рабочих колеса, 16 и 18, с направляющими аппаратами 15 и 17 и уходит в коллектор высокого давления.</p>
+  <p>Вал-шестерня 4 получает вращение от вала НД через муфту 5 (рис. 2) и промежуточное колесо 23 и крутится в 2,33 раза быстрее. Пока ступень не включена, вал ВД стоит, а вода в ней находится под давлением ступени НД. Через канал в валу-шестерне идёт охлаждающая вода — она показана сиреневым.</p>
+  <blockquote>«Ступени нормального и высокого давления включены последовательно: вода с выхода (из напорного коллектора) ступени нормального давления через патрубок 29 (рис.1) поступает на вход ступени высокого давления»<cite>РЭ насоса, п. 3.6</cite></blockquote>
+  <div class="key"><span><span class="sw" style="background:var(--water)"></span>вода</span><span><span class="sw" style="background:var(--cool)"></span>охлаждение через полый вал</span><span><span class="sw" style="background:var(--oil)"></span>масло</span><span><span class="sw" style="background:var(--hp)"></span>редуктор работает</span></div>
+  <p class="note">Путь воды между колёсами 16 и 18 показан упрощённо: в разрезе А-А видна только часть каналов. Направление охлаждающего потока по валу показано условно. Движение замедлено.</p>`,
+  info:{
+ 4:{p:"Вал ступени ВД с зубчатым венцом редуктора. Он полый: по каналу внутри прокачивается вода для охлаждения.",q:[QHEAT,QCOOL]},
+ 23:{p:"Промежуточное колесо повышающего редуктора: передаёт вращение от вала НД, когда включена муфта 5, на вал-шестерню 4.",q:[QDRIVE]},
+ 24:{p:"Подшипники промежуточного колеса 23 на оси 25, смазываются из масляной ванны.",q:[QOIL]},
+ 25:{p:"Неподвижная ось промежуточного колеса 23."},
+ 1:{p:"Два подшипника 308 — опоры вала-шестерни. Работают на высоких оборотах и смазываются из масляной ванны.",q:[QHEAT,QOIL]},
+ 3:{p:"Корпус задней опоры вала. Через него пропускают воду для охлаждения подшипника.",q:[QREAR]},
+ 5:{p:"Корпус опор и редуктора ступени ВД. При работе ступени его нагрев контролируют рукой.",q:[Q("Контролировать температуру корпуса 5 (рис.5) ступени высокого давления – ощутимого нагрева не должно происходить, в противном случае проверить работу перепускной магистрали…","РЭ насоса, п. 5.13.2 к")]},
+ 14:{p:"Корпус ступени с патрубками входа и выхода, внутри — два рабочих колеса и направляющие аппараты.",q:[QHP]},
+ 16:{p:"Рабочее колесо с лопатками, закрученными направо (если смотреть со стороны входа в колесо). Колёса 16 и 18 стоят входами в разные стороны.",q:[QHP,Q("Уплотнения рабочих колес и межступенное уплотнение – щелевого типа…",RE33)]},
+ 18:{p:"Рабочее колесо с лопатками, закрученными налево (если смотреть со стороны входа в колесо).",q:[QHP]},
+ 15:{p:"Направляющий аппарат: лопаточный отвод после рабочего колеса, превращает скорость воды в давление.",q:[QHP]},
+ 17:{p:"Направляющий аппарат между колёсами.",q:[QHP]},
+ 21:{p:"Сальник вала ступени ВД. Устроен как у ступени НД, но кольца меньше, а поджимают их гайкой.",
+     q:[Q("…сальниковое уплотнение вала конструктивно выполнено аналогично описанному для ступени нормального давления, отличается меньшим диаметром уплотнительных колец и способом создания осевого поджатия (гайкой 6 через кольцо 7 - см. рис.4).",RE33),QDROPS]},
+ 6:{p:"Манжета держит масло в корпусе опор со стороны проточной части."},
+ 30:{p:"Крышка торца вала-шестерни. Внутри — камера, связанная с каналом полого вала (охлаждение).",q:[QCOOL]},
+ 13:{p:"Втулка на валу под рабочими колёсами."},
+ 28:{p:"Регулировочные прокладки под крышкой задней опоры."},
+ 11:{p:"Корончатая гайка со шплинтом 12 крепит рабочие колёса на конце вала."}
+ }}
+};
+const NAMES={nd:FIG.nd.D.parts,hp:FIG.hp.D.parts};
+
+const $=s=>document.querySelector(s);
+const cv=$('#cv'), ctx=cv.getContext('2d');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const S={tab:'nd',rpm:1500,hp:false,play:!reduce,layers:{water:true,oil:true,shaft:true,cool:true},hover:null,t:0};
+let F=null, sc=1, W=0, H=0, under=null, inkS=null, shaftS=null, oilS=null, tmp=null, tctx=null, colors={};
+
+function tok(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function readColors(){colors={bg:tok('--paper'),ink:tok('--ink'),water:tok('--water'),waterD:tok('--water-d'),oil:tok('--oil'),steel:tok('--steel'),hi:tok('--steel-hi'),accent:tok('--accent'),hp:tok('--hp'),muted:tok('--muted'),ok:tok('--ok'),cool:tok('--cool'),scene:tok('--scene')}}
+function rgb(c){const d=document.createElement('canvas').getContext('2d');d.fillStyle=c;const v=d.fillStyle;if(v[0]==='#')return [1,3,5].map(i=>parseInt(v.slice(i,i+2),16));return v.match(/\d+/g).slice(0,3).map(Number)}
+function load(src){return new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=src})}
+
+function layerFrom(f,alpha,color,op){
+  const c=document.createElement('canvas');c.width=f.IW;c.height=f.IH;const x=c.getContext('2d');
+  const id=x.createImageData(f.IW,f.IH),d=id.data,[r,g,b]=rgb(color);
+  for(let i=0,j=0;i<alpha.length;i++,j+=4){const a=alpha[i];if(!a)continue;d[j]=r;d[j+1]=g;d[j+2]=b;d[j+3]=a*op}
+  x.putImageData(id,0,0);return c}
+async function prep(f){
+  if(f.raw)return;
+  const [ink,mask]=await Promise.all([load(f.ink),load(f.mask)]);
+  const n=f.IW*f.IH,c=document.createElement('canvas');c.width=f.IW;c.height=f.IH;const x=c.getContext('2d',{willReadFrequently:true});
+  x.drawImage(ink,0,0);let d=x.getImageData(0,0,f.IW,f.IH).data;const R={ink:new Uint8Array(n),water:new Uint8Array(n),oil:new Uint8Array(n),shaft:new Uint8Array(n),cool:new Uint8Array(n)};
+  for(let i=0;i<n;i++)R.ink[i]=d[i*4];
+  x.clearRect(0,0,f.IW,f.IH);x.drawImage(mask,0,0);d=x.getImageData(0,0,f.IW,f.IH).data;
+  for(let i=0,j=0;i<n;i++,j+=4){R.water[i]=d[j];R.oil[i]=d[j+1];const b=d[j+2];if(b>190)R.shaft[i]=255;else if(b>60)R.cool[i]=255}
+  f.raw=R;f.C=null;
+  const D=f.D;f.PATHS=D.paths.map(p=>mkPath(p.pts));if(D.cool)f.COOL=mkPath(D.cool);
+}
+function buildLayers(){
+  readColors();const f=F,R=f.raw;
+  f.C={ink:layerFrom(f,R.ink,colors.ink,1),water:layerFrom(f,R.water,colors.water,.42),oil:layerFrom(f,R.oil,colors.oil,.62),shaftM:layerFrom(f,R.shaft,'#000',1),cool:layerFrom(f,R.cool,colors.cool,.5)};
+  f.Ckey=colors.ink+colors.water;
+  resize();
+}
+function resize(){
+  if(!F||!F.C||S.tab==='m3')return;
+  const f=F,cssW=cv.clientWidth||cv.parentNode.clientWidth, dpr=Math.min(window.devicePixelRatio||1,2);
+  W=Math.round(cssW*dpr);H=Math.round(W*f.IH/f.IW);cv.width=W;cv.height=H;sc=W/f.IW;
+  const mk=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c};
+  under=mk();const u=under.getContext('2d');u.fillStyle=colors.bg;u.fillRect(0,0,W,H);
+  if(S.layers.water)u.drawImage(f.C.water,0,0,W,H);
+  if(S.layers.cool&&f.D.cool)u.drawImage(f.C.cool,0,0,W,H);
+  if(S.layers.oil&&!f.D.oilTop)u.drawImage(f.C.oil,0,0,W,H);
+  inkS=mk();inkS.getContext('2d').drawImage(f.C.ink,0,0,W,H);
+  shaftS=mk();shaftS.getContext('2d').drawImage(f.C.shaftM,0,0,W,H);
+  oilS=mk();oilS.getContext('2d').drawImage(f.C.oil,0,0,W,H);
+  tmp=mk();tctx=tmp.getContext('2d');
+  draw(0);
+}
+
+function mkPath(pts){let L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));return {pts,L,len:L[L.length-1],n:Math.max(2,Math.round(L[L.length-1]/70))}}
+function at(P,s){let i=1;while(i<P.L.length-1&&P.L[i]<s)i++;const a=P.pts[i-1],b=P.pts[i],k=(s-P.L[i-1])/(P.L[i]-P.L[i-1]||1);return [a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k,Math.atan2(b[1]-a[1],b[0]-a[0])]}
+let flow=0, flowHP=0, coolF=0, shaftPh=0, hpPh=0, drops=[], dropT=0, tachoPh=0;
+const hpOn=()=>S.hp&&S.rpm>0;
+
+function stripes(box,phase,col,dir){
+  const X=v=>v*sc,x0=X(box[0]),y0=X(box[1]),w=X(box[2]-box[0]),h=X(box[3]-box[1]);
+  tctx.save();tctx.clearRect(x0,y0,w,h);tctx.globalCompositeOperation='source-over';
+  tctx.fillStyle=colors.steel;tctx.globalAlpha=.55;tctx.fillRect(x0,y0,w,h);
+  const P=X(46),off=(((phase*dir)%1)+1)%1*P;tctx.fillStyle=col||colors.hi;
+  for(let y=y0-P+off;y<y0+h;y+=P){tctx.globalAlpha=.55;tctx.fillRect(x0,y,w,P*.28);tctx.globalAlpha=.25;tctx.fillRect(x0,y+P*.28,w,P*.14)}
+  tctx.globalAlpha=1;tctx.globalCompositeOperation='destination-in';tctx.drawImage(shaftS,x0,y0,w,h,x0,y0,w,h);tctx.restore();
+  ctx.drawImage(tmp,x0,y0,w,h,x0,y0,w,h);
+}
+function particles(paths,fl,col,rx,ry){
+  const X=v=>v*sc;ctx.fillStyle=col;
+  for(const P of paths){for(let i=0;i<P.n;i++){
+    const s=((fl+i*P.len/P.n)%P.len+P.len)%P.len,[x,y,a]=at(P,s);
+    const f=Math.min(1,s/120,(P.len-s)/160);ctx.globalAlpha=.85*Math.max(0,f);
+    ctx.save();ctx.translate(X(x),X(y));ctx.rotate(a);ctx.beginPath();ctx.ellipse(0,0,X(rx),X(ry),0,0,7);ctx.fill();ctx.restore();
+  }}
+  ctx.globalAlpha=1;
+}
+function arrow(a,b,col,txt,side,lp){
+  const X=v=>v*sc;ctx.strokeStyle=col;ctx.lineWidth=X(10);ctx.setLineDash([X(24),X(20)]);ctx.lineDashOffset=X(flow*.6);
+  ctx.globalAlpha=.8;ctx.beginPath();ctx.moveTo(X(a[0]),X(a[1]));ctx.lineTo(X(b[0]),X(b[1]));ctx.stroke();ctx.setLineDash([]);
+  const ang=Math.atan2(b[1]-a[1],b[0]-a[0]);ctx.fillStyle=col;ctx.save();ctx.translate(X(b[0]),X(b[1]));ctx.rotate(ang);
+  ctx.beginPath();ctx.moveTo(X(22),0);ctx.lineTo(X(-14),X(-24));ctx.lineTo(X(-14),X(24));ctx.fill();ctx.restore();ctx.globalAlpha=1;
+  if(txt){const q=lp||[b[0]+30,b[1]+12];label(txt,X(q[0]),X(q[1]),side||'left',col,true)}
+}
+
+function draw(dt){
+  if(!F||!F.C)return;
+  const k=S.rpm/2700, D=F.D, X=v=>v*sc, nd=S.tab==='nd';
+  if(S.play){flow+=dt*360*k;shaftPh+=dt*k*1.6;tachoPh+=dt*k*5;S.t+=dt;if(hpOn()){flowHP+=dt*420*k;hpPh+=dt*k*1.6*2.33;coolF+=dt*260*k}}
+  ctx.drawImage(under,0,0);
+  if(nd&&S.layers.oil){
+    ctx.save();ctx.beginPath();const top=D.oilTop, amp=(1.5+5*k);
+    ctx.moveTo(X(180),X(top+8));
+    for(let x=180;x<=1220;x+=20)ctx.lineTo(X(x),X(top+5+amp*Math.sin(x/38+S.t*3*(.3+k))+amp*.5*Math.sin(x/17-S.t*5*k)));
+    ctx.lineTo(X(1220),X(1300));ctx.lineTo(X(180),X(1300));ctx.closePath();ctx.clip();ctx.drawImage(oilS,0,0);ctx.restore();
+  }
+  if(S.layers.shaft)stripes(D.shaftBox,nd?shaftPh:hpPh,null,1);
+  if(nd){
+    if(S.hp){const pu=.28+.14*Math.sin(S.t*6);ctx.fillStyle=colors.hp;ctx.globalAlpha=pu;for(const r of D.clutch)ctx.fillRect(X(r[0]),X(r[1]),X(r[2]-r[0]),X(r[3]-r[1]));ctx.globalAlpha=1}
+    if(S.layers.water&&S.rpm>0)particles(F.PATHS,flow,colors.waterD,15,5);
+  }else{
+    // промежуточное колесо 23: полосы бегут навстречу валу
+    const g=D.gear;
+    if(hpOn()){ctx.save();ctx.beginPath();ctx.rect(X(g[0]),X(g[1]),X(g[2]-g[0]),X(g[3]-g[1]));ctx.clip();
+      const P=X(40),off=((-shaftPh%1)+1)%1*P;ctx.fillStyle=colors.hp;
+      for(let y=X(g[1])-P+off;y<X(g[3]);y+=P){ctx.globalAlpha=.32;ctx.fillRect(X(g[0]),y,X(g[2]-g[0]),P*.35)}
+      ctx.restore();ctx.globalAlpha=1}
+    if(S.layers.water&&hpOn())particles(F.PATHS,flowHP,colors.waterD,15,5);
+    if(S.layers.cool&&hpOn())particles([F.COOL],coolF,colors.cool,12,4);
+  }
+  ctx.drawImage(inkS,0,0);
+  if(nd){
+    if(S.layers.water&&S.rpm>0)arrow([D.outlet[0][0],D.outlet[0][1]],[D.outlet[1][0],D.outlet[1][1]+20],colors.water,'к напорному коллектору');
+    if(S.rpm>0&&S.play){dropT-=dt;if(dropT<=0){drops.push({y:0,v:0});dropT=1.15}}
+    ctx.fillStyle=colors.water;
+    drops=drops.filter(d=>{if(S.play){d.v+=dt*900;d.y+=d.v*dt}const yy=D.drain[1]+d.y;if(d.y>140)return false;ctx.globalAlpha=1-d.y/140;ctx.beginPath();ctx.arc(X(D.drain[0]),X(yy),X(7),0,7);ctx.fill();return true});
+    ctx.globalAlpha=1;
+    if(S.rpm>0){const on=(tachoPh%1)<.5;ctx.fillStyle=colors.ok;ctx.globalAlpha=on?.9:.15;ctx.beginPath();ctx.arc(X(D.tacho[0][0]),X(D.tacho[0][1]-10),X(12),0,7);ctx.fill();ctx.globalAlpha=1}
+    if(S.hp)label('муфта 5 включена → редуктор ступени ВД',X(720),X(1240),'center',colors.hp,true);
+  }else{
+    if(S.layers.water&&hpOn()){
+      arrow([D.inlet[0],D.inlet[1]-10],[D.inlet[0],D.inlet[1]+150],colors.water,'от коллектора НД ↓','right',[D.inlet[0]-34,D.inlet[1]+70]);
+      arrow(D.outlet[0],D.outlet[1],colors.water,'↑ к коллектору ВД','left',[D.outlet[1][0]+34,D.outlet[1][1]+150]);
+    }
+    const r=Math.round(S.rpm*2.33/10)*10;
+    label(hpOn()?`вал ВД: ${fmtN(r)} об/мин (×2,33)`:(S.rpm>0?'ступень ВД не включена: вал стоит, вода под давлением ступени НД':'насос не работает'),X(40),X(70),'left',hpOn()?colors.hp:colors.muted,true);
+  }
+  for(const [n,col,pulse] of [[S.hover,colors.muted,false],[F.sel,colors.accent,true]]){
+    if(n==null||!D.parts[n])continue;const [x,y]=D.parts[n][1];const r=X(30)+(pulse?X(6)*Math.sin(S.t*4):0);
+    ctx.strokeStyle=col;ctx.lineWidth=Math.max(2,X(6));ctx.beginPath();ctx.arc(X(x),X(y),r,0,7);ctx.stroke();
+    if(pulse)label(n+' · '+D.parts[n][0],X(x),X(y)-r-X(14),'center',col,true);
+  }
+}
+function label(t,x,y,al,col,box){
+  const dpr=W/(cv.clientWidth||W);ctx.font=`600 ${Math.round(13*dpr)}px ${tok('--f-body')}`;ctx.textAlign=al;ctx.textBaseline='bottom';
+  if(box){const w=ctx.measureText(t).width,p=5*dpr,x0=al==='center'?x-w/2:al==='right'?x-w:x;const xx=Math.max(p,Math.min(W-w-p,x0));ctx.fillStyle=colors.bg;ctx.globalAlpha=.92;ctx.fillRect(xx-p,y-16*dpr-p/2,w+2*p,18*dpr+p);ctx.globalAlpha=1;ctx.textAlign='left';ctx.fillStyle=col;ctx.fillText(t,xx,y);return}
+  ctx.fillStyle=col;ctx.fillText(t,x,y)}
+
+let last=0;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;if(S.tab==='m3')draw3(dt);else if(W)draw(dt);requestAnimationFrame(loop)}
+
+// ---------- UI ----------
+function fmtN(v){return v.toLocaleString('ru-RU').replace(/\s/g,' ')}
+$('#rpm').addEventListener('input',e=>{S.rpm=+e.target.value;$('#rpmOut').textContent=fmtN(S.rpm)+' об/мин'});
+$('#hp').onclick=e=>{S.hp=!S.hp;e.currentTarget.setAttribute('aria-pressed',S.hp)};
+const playBtn=$('#play');function syncPlay(){playBtn.textContent=S.play?'Пауза':'Пуск';playBtn.setAttribute('aria-pressed',!S.play)}
+playBtn.onclick=()=>{S.play=!S.play;syncPlay()};syncPlay();
+$('#zoom').onclick=e=>{const z=$('#scroller').classList.toggle('zoomed');e.currentTarget.setAttribute('aria-pressed',z);e.currentTarget.textContent=z?'Мельче':'Крупнее';requestAnimationFrame(resize)};
+
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function renderLegend(){
+  const g=$('#groups');g.innerHTML='';
+  if(S.tab==='m3'){$('#legT').textContent='Детали модели';$('#legN').textContent='Нажмите деталь в списке или на модели.';renderList3();return}
+  const M=META[S.tab];$('#legT').textContent='Детали по '+(S.tab==='nd'?'рис. 2':'рис. 5');$('#legN').textContent='Нажмите номер или деталь на чертеже.';
+  for(const [gn,list] of M.groups){const d=document.createElement('div');d.className='grp';d.innerHTML=`<b>${gn}</b><div class="parts"></div>`;
+    const box=d.querySelector('.parts');for(const n of list){if(!F.D.parts[n])continue;const b=document.createElement('button');b.dataset.part=n;b.setAttribute('aria-pressed','false');b.innerHTML=`<span class="n">${n}</span>${esc(F.D.parts[n][0])}`;b.onclick=()=>select(n);box.appendChild(b)}
+    g.appendChild(d)}
+}
+function detHTML(n,name,inf,fig){
+  let h=`<h2>Выбрано</h2><h3>${n!=null?`<span class="num">${n}</span>`:''}${esc(name)}</h3>`;
+  if(fig)h+=`<p class="note">${fig}</p>`;
+  if(inf&&inf.p)h+=`<p>${esc(inf.p)}</p>`;for(const q of (inf&&inf.q)||[])h+=`<blockquote>«${esc(q.t)}»<cite>${esc(q.c)}</cite></blockquote>`;
+  return h}
+function select(n){F.sel=+n;document.querySelectorAll('[data-part]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.part===F.sel));
+  const inf=META[S.tab].info[n];let h=detHTML(n,F.D.parts[n][0],inf);
+  if(!inf)h+=`<p class="note">Позиция ${n} по легенде ${S.tab==='nd'?'рис. 2':'рис. 5'} РЭ насоса.</p>`;$('#det').innerHTML=h}
+
+function toImg(e){const r=cv.getBoundingClientRect();return [(e.clientX-r.left)/r.width*F.IW,(e.clientY-r.top)/r.height*F.IH]}
+function nearest(x,y){let best=null,bd=55;for(const n in F.D.parts){const [px,py]=F.D.parts[n][1];const d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best=+n}}return best}
+const tip=$('#tip');
+cv.addEventListener('pointermove',e=>{if(!F)return;const [x,y]=toImg(e);const n=nearest(x,y);S.hover=n;cv.style.cursor=n?'pointer':'default';
+  if(n&&e.pointerType==='mouse'){const sr=$('#st2').getBoundingClientRect();tip.textContent=n+' · '+F.D.parts[n][0];tip.style.left=(e.clientX-sr.left)+'px';tip.style.top=(e.clientY-sr.top)+'px';tip.classList.add('on')}else tip.classList.remove('on')});
+cv.addEventListener('pointerleave',()=>{S.hover=null;tip.classList.remove('on')});
+cv.addEventListener('click',e=>{if(!F)return;const [x,y]=toImg(e);const n=nearest(x,y);if(n)select(n)});
+
+function layerChips(){
+  const box=$('#layers2');box.innerHTML='';
+  for(const [k,t,c] of META[S.tab].layers){const b=document.createElement('button');b.dataset.layer=k;b.setAttribute('aria-pressed',S.layers[k]);
+    b.innerHTML=`<span class="sw" style="background:var(${c})"></span>${t}`;b.onclick=()=>{S.layers[k]=!S.layers[k];b.setAttribute('aria-pressed',S.layers[k]);resize()};box.appendChild(b)}
+}
+async function setTab(t){
+  S.tab=t;document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  const is3=t==='m3';$('#st2').hidden=is3;$('#st3').hidden=!is3;$('#bar3').hidden=!is3;$('#layers2').hidden=is3;$('#how').hidden=false;
+  try{history.replaceState(null,'','#'+t)}catch(e){}
+  if(is3){F=null;$('#how').innerHTML=HOW3;init3D();renderLegend();sel3(V3&&V3.sel!=null?V3.sel:null);size3();return}
+  F=FIG[t];S.hover=null;$('#how').innerHTML=META[t].how;layerChips();
+  await prep(F);if(S.tab!==t)return;
+  readColors();if(!F.C||F.Ckey!==colors.ink+colors.water)buildLayers();else resize();
+  renderLegend();select(F.sel||META[t].sel);
+}
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{resize();size3()},120)});
+const themeChange=()=>{readColors();if(F&&F.raw)buildLayers();if(V3)V3.retheme()};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',themeChange);
+new MutationObserver(themeChange).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+// ---------- 3D ----------
+const HOW3=`<h2>Что показано</h2>
+<p>Модель собрана по рисункам 1, 2 и 5 РЭ насоса: ступень нормального давления с улиткой и муфтой, сбоку сверху — ступень высокого давления с редуктором. Секущая плоскость проходит через оси обоих валов.</p>
+<p>Ползунок «Вал НД» крутит вал ступени НД. Кнопка «Ступень ВД» включает муфту 5: начинают вращаться барабан муфты, промежуточное колесо 23 и вал-шестерня ступени ВД — в 2,33 раза быстрее вала НД.</p>
+<div class="key"><span><span class="sw" style="background:var(--water)"></span>вода</span><span><span class="sw" style="background:var(--cool)"></span>охлаждение вала ВД</span><span><span class="sw" style="background:var(--hp)"></span>муфта включена</span></div>
+<p class="note">Точность модели около ±2 мм по рисункам РЭ. Лопатки колеса НД и колёса ВД упрощены, патрубок 29 и коллекторы не показаны. Вращение замедлено.</p>`;
+let V3=null;
+const NUM=s=>{const m=/^(?:ВД )?(\d+)\s/.exec(s);return m?+m[1]:null};
+function partInfo(name){const hpP=name.startsWith('ВД '),n=NUM(name);const M=META[hpP?'hp':'nd'];return {n,inf:n!=null?M.info[n]:null,fig:hpP?'Ступень ВД, рис. 5':'Ступень НД, рис. 2'}}
+function cleanName(s){return s.replace(/^ВД /,'').replace(/^\d+\s+/,'')}
+const GRP3=[["Ступень НД: проточная часть",/^(14 |12 |13 |11 |Гайка крепления|20 |16 Кран)/],["Ступень НД: вал, опоры, сальник",/^(Вал$|Гайка конца|1 |3 |4 |9 |25 |26 |24 |2 |15 |17 |10 |Гильза|Нажимное|18 |Щуп)/],["Привод ступени ВД",/^(5 |Барабан|6 |19 |8 )/],["Ступень ВД",/^ВД /],["Крепёж",/./]];
+function init3D(){
+  if(V3)return;
+  if(typeof THREE==='undefined'){$('#v3msg').textContent='3D недоступно: не загрузилась библиотека.';return}
+  let R;try{R=new THREE.WebGLRenderer({antialias:true});}catch(e){$('#v3msg').textContent='3D недоступно на этом устройстве (нет WebGL).';return}
+  $('#v3msg').remove();
+  const host=$('#v3');R.setPixelRatio(Math.min(devicePixelRatio||1,2));R.localClippingEnabled=true;R.outputEncoding=THREE.sRGBEncoding;host.prepend(R.domElement);
+  const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(32,1,.005,20);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x5a6168,1.05));
+  const d1=new THREE.DirectionalLight(0xffffff,.85);d1.position.set(1.5,3,-1);scene.add(d1);
+  const d2=new THREE.DirectionalLight(0xffffff,.35);d2.position.set(-2,1,2);scene.add(d2);
+  const ctl=new THREE.OrbitControls(cam,R.domElement);ctl.enableDamping=true;ctl.dampingFactor=.12;ctl.minDistance=.25;ctl.maxDistance=3;
+  // секущая плоскость через оси НД и ВД
+  const U=new THREE.Vector3(0,.9635,-.2676);const plane=new THREE.Plane(U.clone().negate(),0);
+  const bin=Uint8Array.from(atob(MODEL_BIN),c=>c.charCodeAt(0)).buffer;
+  const lo=MODEL.lo,s3=MODEL.sc;
+  const AX={nd:new THREE.Vector3(0,0,0),hp:new THREE.Vector3(0,.055,.198),g23:new THREE.Vector3(0,.0331,.119)};
+  const parts=[],pick=[];
+  // разборка: смещения только в секущей плоскости (вдоль оси X и вдоль W — от оси НД к оси ВД), чтобы детали не уходили за разрез
+  const WV=new THREE.Vector3(0,.2676,.9635);
+  const ex=(n)=>{
+    let x=0,w=0;
+    if(/^(12 |13 |Шпильки|Болты|11 )/.test(n))x=.16;
+    else if(/^(14 |Гайка крепления)/.test(n))x=.09;
+    else if(/^(15 |17 |Нажимное|Гильза|10 )/.test(n))x=.045;
+    else if(/^(1 |Гайка конца|26 |25 |3 |24 |2 |4 )/.test(n))x=-.08;
+    else if(/^(5 |Барабан|6 |19 )/.test(n))w=-.12;
+    else if(/^8 /.test(n))w=-.2;
+    else if(/^ВД /.test(n)){w=.16;
+      if(/^ВД 14/.test(n))x=.14;else if(/^ВД (16|15)/.test(n))x=.09;else if(/^ВД (18|17|Гайка)/.test(n))x=.05;
+      else if(/^ВД (30|Штуцер)/.test(n))x=-.07;else if(/^ВД (23|25|24)/.test(n))w=.06;else if(/^ВД Кронштейн/.test(n))w=.1}
+    return [x,WV.y*w,WV.z*w]};
+  const rotOf=n=>{
+    if(/^(Вал$|Гайка конца|1 Полумуфта|24 Ротор|14 |Гайка крепления|Гильза|5 Муфта фрикционная: стальные|6 Гайка)/.test(n))return ['nd',1];
+    if(/^(Барабан|5 Муфта фрикционная: фрикционные)/.test(n))return ['nd',1,'clutch'];
+    if(/^ВД (4 |18 |16 |Гайка|Зубчатый)/.test(n))return ['hp',1,'clutch'];
+    if(/^ВД 23/.test(n))return ['g23',-1,'clutch'];
+    return null};
+  const glassRe=/^(20 |12 |ВД 14|ВД 5 |25 Корпус|ВД 30|ВД Кронштейн)/;
+  for(const p of MODEL.parts){
+    const q=new Uint16Array(bin,p.p,p.nv*3),pos=new Float32Array(p.nv*3);for(let i=0;i<pos.length;i++)pos[i]=lo[i%3]+q[i]*s3[i%3];
+    const nq=new Int8Array(bin,p.n,p.nv*3),nor=new Float32Array(p.nv*3);for(let i=0;i<nor.length;i++)nor[i]=nq[i]/127;
+    const idx=p.i32?new Uint32Array(bin,p.i,p.ni):new Uint16Array(bin,p.i,p.ni);
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('normal',new THREE.BufferAttribute(nor,3));g.setIndex(new THREE.BufferAttribute(idx.slice(),1));
+    const col=new THREE.Color().setRGB(...p.col).convertSRGBToLinear();
+    const mat=new THREE.MeshStandardMaterial({color:col,metalness:.05,roughness:.7,clippingPlanes:[plane],side:THREE.FrontSide});
+    const cap=new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(.55),clippingPlanes:[plane],side:THREE.BackSide});
+    const r=rotOf(p.name),ax=r?AX[r[0]]:AX.nd;
+    const holder=new THREE.Group(),pivot=new THREE.Group();pivot.position.copy(ax);
+    const m=new THREE.Mesh(g,mat),mc=new THREE.Mesh(g,cap);m.position.copy(ax).negate();mc.position.copy(ax).negate();
+    pivot.add(m,mc);holder.add(pivot);scene.add(holder);
+    const P={name:p.name,mat,cap,holder,pivot,rot:r,ex:ex(p.name),glass:glassRe.test(p.name),col,i:parts.length};m.userData.P=P;parts.push(P);pick.push(m);
+  }
+  // вода: частицы
+  const NND=380,NHP=260,NC=70,NT=NND+NHP+NC;
+  const pg=new THREE.BufferGeometry(),pp=new Float32Array(NT*3),pc=new Float32Array(NT*3);
+  pg.setAttribute('position',new THREE.BufferAttribute(pp,3));pg.setAttribute('color',new THREE.BufferAttribute(pc,3));
+  const pm=new THREE.PointsMaterial({size:.0075,vertexColors:true,clippingPlanes:[plane],transparent:true,opacity:.95,depthWrite:false});
+  const pts=new THREE.Points(pg,pm);pts.frustumCulled=false;scene.add(pts);
+  const seed=new Float32Array(NT*3);for(let i=0;i<seed.length;i++)seed[i]=Math.random();
+  const XG=px=>(318+(px-1515)/3.9)/1000, ND=v=>v/1000;
+  const out=new THREE.Vector3();
+  const fc=(x,Y,Z)=>out.set(x,Z,-Y); // FreeCAD мм -> glTF м уже в метрах
+  const polar=(x,r,a,cy,cz)=>fc(x,cy+r*Math.sin(a),cz+r*Math.cos(a));
+  const A38=38*Math.PI/180;
+  function pND(s,a,b,c){
+    if(s<.35){const t=s/.35;return polar(ND(560-160*t),ND(8+b*48),a,0,0)}
+    if(s<.6){const t=(s-.35)/.25;return polar(ND(368+(c-.5)*14),ND(52+88*t),a-1.6*t,0,0)}
+    const a1=a-1.6;let dl=((a1-A38)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
+    if(s<.88){const t=(s-.6)/.28;return polar(ND(367+(c-.5)*30),ND(150+(b-.5)*10),a1-dl*t,0,0)}
+    const t=(s-.88)/.12;const r=.152;return fc(ND(367+(c-.5)*30),r*Math.sin(A38)*(1-t)+.078*t+(b-.5)*.03,r*Math.cos(A38)+t*.09)}
+  const Y0=-.198,Z0=.055;
+  function pHP(s,a,b,c){
+    const st=b<.5?0:1;
+    if(c<.18){ // вход и выход сверху
+      const inl=b<.5,x=XG(inl?1072:1245)+(a/6.28-.5)*.03;const t=inl?s:1-s;return polar(x,.19-.07*t,0,Y0,Z0)}
+    const x=XG(st?1257:1100)+(c-.5)*.012;return polar(x,.03+.058*s,a-1.4*s,Y0,Z0)}
+  function pCool(s,a,b){return polar(XG(150+1290*s),.0045*b,a,Y0,Z0)}
+  const cW=new THREE.Color(),cC=new THREE.Color();
+  const st={nd:0,hp:0,g23:0,cl:0,ph:new Float32Array(NT),sel:null,hl:null,water:true};
+  for(let i=0;i<NT;i++)st.ph[i]=Math.random();
+  function setColors(){cW.set(colors.water||'#2e86d1').convertSRGBToLinear();cC.set(colors.cool||'#c04fc4').convertSRGBToLinear();
+    for(let i=0;i<NT;i++){const c=i>=NND+NHP?cC:cW;pc[i*3]=c.r;pc[i*3+1]=c.g;pc[i*3+2]=c.b}pg.attributes.color.needsUpdate=true;
+    scene.background=new THREE.Color(colors.scene||'#dfe5ea')}
+  readColors();setColors();
+  // вид по умолчанию: со стороны снятой половины
+  const C0=new THREE.Vector3(.27,.03,.08);
+  function home(){cam.up.set(0,-.2676,-.9635);cam.position.copy(C0).addScaledVector(U,1.05).addScaledVector(WV,-.2).add(new THREE.Vector3(.07,0,0));ctl.target.copy(C0);ctl.update()}
+  home();
+  let explode=0,cutV=.5,glass=false;
+  function applyCut(){plane.constant=cutV>=.999?10:(cutV-.5)*.7+.0015}
+  function applyExplode(){for(const P of parts)P.holder.position.set(P.ex[0]*explode*.75,P.ex[1]*explode*.75,P.ex[2]*explode*.75)}
+  function applyGlass(){for(const P of parts){if(!P.glass)continue;P.mat.transparent=glass;P.mat.opacity=glass?.22:1;P.mat.depthWrite=!glass;P.cap.visible=!glass;P.mat.needsUpdate=true}}
+  function highlight(P){if(st.hl)st.hl.mat.emissive.setHex(0);st.hl=P;if(P)P.mat.emissive.set(colors.accent).multiplyScalar(.35)}
+  applyCut();
+  // выбор детали касанием
+  const ray=new THREE.Raycaster(),v2=new THREE.Vector2();let down=null;
+  R.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY]});
+  R.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;down=null;
+    const r=R.domElement.getBoundingClientRect();v2.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(v2,cam);
+    const hits=ray.intersectObjects(pick,false).filter(h=>plane.distanceToPoint(h.point)>=-1e-4&&!(glass&&h.object.userData.P.glass));
+    sel3(hits.length?hits[0].object.userData.P.i:null)});
+  V3={R,scene,cam,ctl,parts,home,sel:null,highlight,
+    retheme(){setColors();if(st.hl)highlight(st.hl)},
+    size(){const w=host.clientWidth,h=host.clientHeight;if(!w)return;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()},
+    frame(dt){
+      const k=S.rpm/2700,w=S.play?dt*k*2*Math.PI*.9:0,on=hpOn();
+      st.nd+=w;if(on){st.hp+=w*2.33;st.g23-=w}
+      st.cl+=((on?1:0)-st.cl)*Math.min(1,dt*6);
+      for(const P of parts){if(!P.rot)continue;const [a,dir,cl]=P.rot;P.pivot.rotation.x=a==='nd'?(cl?(P.cAng=(P.cAng||0)+(on?w:0)):st.nd):a==='hp'?st.hp:st.g23}
+      for(const P of parts)if(/^(5 Муфта|Барабан)/.test(P.name)){P.mat.emissive.set(colors.hp).multiplyScalar(.45*st.cl);if(st.hl===P)P.mat.emissive.set(colors.accent).multiplyScalar(.35)}
+      // частицы
+      pts.visible=st.water&&S.rpm>0&&explode<.05;
+      if(pts.visible){const sp=S.play?dt*k*.35:0;
+        for(let i=0;i<NT;i++){
+          let v;if(i<NND){st.ph[i]=(st.ph[i]+sp)%1;v=pND(st.ph[i],seed[i*3]*6.283,seed[i*3+1],seed[i*3+2])}
+          else if(i<NND+NHP){if(on)st.ph[i]=(st.ph[i]+sp*1.6)%1;v=pHP(st.ph[i],seed[i*3]*6.283,seed[i*3+1],seed[i*3+2]);if(!on&&seed[i*3+2]<.18)v.set(0,-9,0)}
+          else{if(on)st.ph[i]=(st.ph[i]+sp*1.2)%1;v=pCool(st.ph[i],seed[i*3]*6.283,seed[i*3+1]);if(!on)v.set(0,-9,0)}
+          pp[i*3]=v.x;pp[i*3+1]=v.y;pp[i*3+2]=v.z}
+        pg.attributes.position.needsUpdate=true}
+      ctl.update();R.render(scene,cam)},
+    setCut(v){cutV=v;applyCut()},setExplode(v){explode=v;applyExplode()},setGlass(v){glass=v;applyGlass()},setWater(v){st.water=v}
+  };
+  V3.size();
+}
+function size3(){if(V3&&S.tab==='m3')V3.size()}
+function draw3(dt){if(V3)V3.frame(dt)}
+function renderList3(){
+  const g=$('#groups');if(!V3){g.innerHTML='<p class="note">Модель ещё не загружена.</p>';return}
+  const used=new Set();
+  for(const [gn,re] of GRP3){const list=V3.parts.filter(P=>!used.has(P)&&re.test(P.name));if(!list.length)continue;list.forEach(P=>used.add(P));
+    const d=document.createElement('div');d.className='grp';d.innerHTML=`<b>${gn}</b><div class="parts"></div>`;const box=d.querySelector('.parts');
+    for(const P of list){const b=document.createElement('button');b.dataset.p3=P.i;b.setAttribute('aria-pressed',V3.sel===P.i);const n=NUM(P.name);
+      b.innerHTML=(n!=null?`<span class="n">${n}</span>`:'')+esc(cleanName(P.name).replace(/\s*\(.*\)$/,''));b.onclick=()=>sel3(P.i);box.appendChild(b)}
+    g.appendChild(d)}
+}
+function sel3(i){
+  if(!V3){$('#det').innerHTML='<h2>Выбрано</h2><p class="note">Нажмите деталь на модели или в списке.</p>';return}
+  V3.sel=i;document.querySelectorAll('[data-p3]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.p3===i));
+  if(i==null){V3.highlight(null);$('#det').innerHTML='<h2>Выбрано</h2><p class="note">Нажмите деталь на модели или в списке.</p>';return}
+  const P=V3.parts[i];V3.highlight(P);const {n,inf,fig}=partInfo(P.name);$('#det').innerHTML=detHTML(n,cleanName(P.name),inf,fig);
+}
+$('#cut').addEventListener('input',e=>{const v=+e.target.value/100;$('#cutOut').textContent=v>=1?'без разреза':Math.abs(v-.5)<.01?'по осям':(v<.5?'глубже':'ближе');if(V3)V3.setCut(v)});
+$('#exp').addEventListener('input',e=>{const v=+e.target.value/100;$('#expOut').textContent=v<.01?'собран':Math.round(v*100)+' %';if(V3)V3.setExplode(v)});
+$('#glass').onclick=e=>{const v=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',v);if(V3)V3.setGlass(v)};
+$('#w3').onclick=e=>{const v=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',v);if(V3)V3.setWater(v)};
+$('#home3').onclick=()=>{if(V3)V3.home()};
+
+// старт
+if(/[?&]app=1|from=emu/.test(location.search)||document.referrer.includes('index.html'))$('#back').hidden=false;
+readColors();
+const h0=(location.hash||'').slice(1);
+setTab(FIG[h0]||h0==='m3'?h0:'nd');
+requestAnimationFrame(loop);
+</script>

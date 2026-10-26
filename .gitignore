@@ -9,3 +9,4 @@ android/build/
 tools/tests/test.html
 node_modules/
 __pycache__/
+tools/tests/*.png

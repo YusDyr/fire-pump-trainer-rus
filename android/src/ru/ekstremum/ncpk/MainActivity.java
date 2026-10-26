@@ -81,7 +81,9 @@ public class MainActivity extends Activity {
         web.evaluateJavascript("(function(){var m=document.getElementById('plateModal');if(m&&!m.hidden){m.hidden=true;return '1'}return '0'})()",
             new android.webkit.ValueCallback<String>() {
                 @Override public void onReceiveValue(String r) {
-                    if (!"\"1\"".equals(r)) MainActivity.super.onBackPressed();
+                    if ("\"1\"".equals(r)) return;
+                    if (web.canGoBack()) web.goBack();   // со страницы «Устройство насоса» — назад к пульту
+                    else MainActivity.super.onBackPressed();
                 }
             });
     }
