@@ -36,6 +36,7 @@ details{{border-top:1px solid var(--line);padding:8px 0}}details:first-of-type{{
  <div class="brand"><div class="plate">АЦ<br>1,6-40/4</div><div><h1>Тренажёр пожарного насоса НЦПК-40/100-4/400М-В1У</h1><p class="sub">Учебный эмулятор насосной установки · ГАЗон NEXT C41R33 · ДПК «Экстремум»</p></div></div>
  <div class="btns">
   <a class="btn primary" href="emulator/">▶ Открыть эмулятор <small>в браузере</small></a>
+  <a class="btn" href="emulator/ustroystvo.html">⚙️ Устройство насоса <small>разрезы и 3D</small></a>
   <a class="btn" href="NCPK-emulator.apk" download>📱 Скачать для Android <small>v{V} · {apk:.0f} МБ</small></a>
   <a class="btn" href="https://github.com/YusDyr/fire-pump-trainer-rus/releases">Все версии</a>
  </div>
