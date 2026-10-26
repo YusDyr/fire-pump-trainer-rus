@@ -18,10 +18,12 @@ doc.Label = 'НЦПК-40/100-4/400 — ступени НД и ВД' + (' (раз
 def xmm(px): return (px - P.X0) / P.S
 
 grp = {}
-for g in ['Проточная часть', 'Вал и опоры', 'Привод ступени ВД', 'Уплотнение вала', 'Корпусные детали', 'Тахометр', 'Ступень ВД', 'Подложка']:
+for g in ['Проточная часть', 'Вал и опоры', 'Привод ступени ВД', 'Уплотнение вала', 'Корпусные детали', 'Тахометр', 'Ступень ВД', 'Обвязка (рис. 1)', 'Пеносмеситель (рис. 10)', 'Подложка']:
     grp[g] = doc.addObject('App::DocumentObjectGroup', 'G%d' % len(grp)); grp[g].Label = g
 def group_of(label):
     if label.startswith('ВД '): return 'Ступень ВД'
+    if label.startswith('ПС '): return 'Пеносмеситель (рис. 10)'
+    if label.startswith('П '): return 'Обвязка (рис. 1)'
     n = label.split(' ')[0]
     m = {'Проточная часть': ['11','12','13','14','Напорный','Гайка'],
          'Вал и опоры': ['Вал','1','3','4','9','25','26','Гайка'],
@@ -81,6 +83,8 @@ def feat(nm, label, shape, c, tr=0, precut=False):
     if CUT and not precut:
         shape = shape.cut(hpcutter if label.startswith('ВД ') else cutter)
         if shape.isNull() or not shape.Solids: return None
+        if not shape.isValid():
+            shape = shape.copy(); shape.fix(1e-4, 1e-4, 1e-3)
     o = doc.addObject('Part::Feature', nm); o.Label = label; o.Shape = shape
     finish(o, label, c, tr); return o
 
@@ -153,6 +157,9 @@ F = P.FORK
 feat(F['name'], F['label'], Part.makeCylinder(F['r'], F['L'], V(xmm(F['x']), -55, F['z']), V(0,1,0)), F['color'])
 import hp
 for _n, _l, _s, _c in hp.build():
+    feat(_n, _l, _s, _c)
+import piping
+for _n, _l, _s, _c in piping.build():
     feat(_n, _l, _s, _c)
 
 # Подложка: рис. 2 в масштабе, в плоскости XZ, за моделью

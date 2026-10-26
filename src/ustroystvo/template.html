@@ -8,18 +8,18 @@
 :root{
   --bg:#e9edf0; --paper:#fbfcfd; --ink:#1b2530; --muted:#5b6874; --line:#cdd5dc;
   --water:#2e86d1; --water-d:#0d4f8c; --oil:#d99a17; --steel:#8b97a3; --steel-hi:#e9eef3;
-  --cool:#c04fc4; --accent:#c8352b; --hp:#e46a1c; --ok:#2f8f55; --scene:#dfe5ea;
+  --cool:#c04fc4; --foam:#c9a41c; --accent:#c8352b; --hp:#e46a1c; --ok:#2f8f55; --scene:#dfe5ea;
   --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#10161b; --paper:#172028; --ink:#d5dee6; --muted:#8c99a5; --line:#2a3640;
   --water:#3d9be6; --water-d:#9fd2ff; --oil:#e5a93a; --steel:#6f7d8a; --steel-hi:#c7d2dc;
-  --cool:#e07ae4; --accent:#ff5b4c; --hp:#ff8a3d; --ok:#4cc27c; --scene:#1b252e; color-scheme:dark}}
+  --cool:#e07ae4; --foam:#e8c440; --accent:#ff5b4c; --hp:#ff8a3d; --ok:#4cc27c; --scene:#1b252e; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#10161b; --paper:#172028; --ink:#d5dee6; --muted:#8c99a5; --line:#2a3640;
   --water:#3d9be6; --water-d:#9fd2ff; --oil:#e5a93a; --steel:#6f7d8a; --steel-hi:#c7d2dc;
-  --cool:#e07ae4; --accent:#ff5b4c; --hp:#ff8a3d; --ok:#4cc27c; --scene:#1b252e; color-scheme:dark}
+  --cool:#e07ae4; --foam:#e8c440; --accent:#ff5b4c; --hp:#ff8a3d; --ok:#4cc27c; --scene:#1b252e; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
@@ -130,8 +130,11 @@ blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:12.
   <div class="bar" id="bar3" hidden>
     <div class="rng">
       <span class="lbl">Разрез</span>
-      <input type="range" id="cut" min="0" max="100" step="1" value="50" aria-label="Положение секущей плоскости">
-      <output id="cutOut" for="cut">по осям</output>
+      <input type="range" id="cut" min="0" max="620" step="2" value="358" aria-label="Положение секущей плоскости">
+      <output id="cutOut" for="cut">по оси НД</output>
+    </div>
+    <div class="chips" role="group" aria-label="Разрез">
+      <button data-cut="358">по оси НД</button><button data-cut="558">по оси ВД</button><button data-cut="0">без разреза</button>
     </div>
     <div class="rng">
       <span class="lbl">Разборка</span>
@@ -141,6 +144,8 @@ blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:12.
     <div class="chips">
       <button id="glass" aria-pressed="false">Прозрачный корпус</button>
       <button id="w3" aria-pressed="true"><span class="sw" style="background:var(--water)"></span>Вода</button>
+      <button id="pipes3" aria-pressed="true">Обвязка</button>
+      <button id="foam3" aria-pressed="false" title="Кран эжектора открыт: пеносмеситель подсасывает пенообразователь"><span class="sw" style="background:var(--foam)"></span>Пена</button>
       <button id="home3">Исходный вид</button>
     </div>
   </div>
@@ -245,6 +250,41 @@ const META={
  11:{p:"Корончатая гайка со шплинтом 12 крепит рабочие колёса на конце вала."}
  }}
 };
+// обвязка (рис. 1) и пеносмеситель (рис. 10) — только для 3D
+const RE34="РЭ насоса, п. 3.4", RE37="РЭ насоса, п. 3.7", RE38="РЭ насоса, п. 3.8";
+const QCOLL=Q("На напорном коллекторе установлены два вентиля 1 для подачи воды в напорные рукава и вентиль 10 для подачи воды в цистерну, элементы вакуумной системы, элементы системы дозирования пенообразователя и панель с контрольно-измерительными приборами и органами управления.",RE34);
+const QGAUGE=Q("Мановакуумметр 19 (рис 1) на входе в насос и два манометра 12 и 18 для контроля давления на выходе, соответственно, ступеней нормального и высокого давления – стрелочного типа.","РЭ насоса, п. 3.9");
+const QFOAM=Q("Пеносмеситель обеспечивает подсос пенообразователя и дозированную подачу его во всасывающую полость ступени нормального давления.",RE38);
+const QEJ=Q("Пеносмеситель состоит из эжекторного насоса (эжектора), крана 1 включения эжектора, дозатора 2 и обратного лепесткового клапана 4.  Эжекторный насос состоит из сопла 14, корпуса 13 и диффузора 10.",RE38);
+META.p1={info:{
+ 3:{p:"Литой коллектор над напорным патрубком ступени НД. От него вода идёт к вентилям, в цистерну, к ступени ВД и к пеносмесителю.",q:[Q("Напорный коллектор 3 (рис.1) насоса нормального давления крепится к его корпусу, а также, через патрубок 29, - к корпусу насоса высокого давления.",RE34),QCOLL,Q("Кроме того, коллектор имеет выход на лафетный ствол, закрытый заглушкой 26.",RE34)]},
+ 1:{p:"Вентиль для подачи воды в напорный рукав. Маховик через шток поднимает клапан с седла (рис. 7). Выход — вниз-наружу, с соединительной головкой.",q:[QCOLL]},
+ 10:{p:"Вентиль подачи воды из коллектора в цистерну. Направление выхода в модели условное.",q:[QCOLL]},
+ 29:{p:"Труба, по которой вода с выхода ступени НД попадает на вход ступени ВД.",q:[Q("Ступени нормального и высокого давления включены последовательно: вода с выхода (из напорного коллектора) ступени нормального давления через патрубок 29 (рис.1) поступает на вход ступени высокого давления","РЭ насоса, п. 3.6")]},
+ 22:{p:"Коллектор на выходном патрубке ступени ВД, на нём кран 23 и перепускной клапан 21.",q:[Q("Напорный коллектор 22 (рис.1) насоса высокого давления крепится к его корпусу (к выходному патрубку).  На напорном коллекторе установлен один (или два) запорный кран 23 шарового типа и перепускной клапан 21.",RE37)]},
+ 23:{p:"Шаровой кран выхода высокого давления, к нему подключают рукав ВД.",q:[Q("…запорный кран 23 шарового типа…",RE37)]},
+ 21:{p:"Пружинный клапан: при давлении выше 20 кгс/см² сбрасывает часть воды в цистерну, чтобы ступень ВД не перегревалась без расхода.",q:[Q("Перепускной клапан обеспечивает обмен воды в насосе за счет частичного перетока воды в цистерну пожарного автомобиля, предотвращая тем самым перегрев насоса при нулевой подаче ступени высокого давления (при закрытых стволах-распылителях или вентилях).",RE37),Q("Усилие пружины 4 обеспечивает открытие клапана при давлении свыше 20 кг/см2.  Поэтому при работе одной ступени нормального давления клапан закрыт и открывается только после включения ступени высокого давления.",RE37)]},
+ 25:{p:"Кран между вакуумным агрегатом и полостью насоса. Открыт только при заборе воды.",q:[Q("…открыть вакуумный кран 25 (поднять рукоятку вертикально);","РЭ насоса, п. 5.13.1 а")]},
+ 2:{p:"Электрод в верхней точке коллектора: когда до него доходит вода, блок управления выключает вакуумный агрегат.",q:[Q("Датчик заполнения представляет собой электрод 6, установленный через изолятор 4 в верхней точке внутренней полости центробежного насоса, а именно – в коллекторе нормального давления 7.","РЭ насоса, п. 3.11.1")]},
+ 4:{p:"Панель на коллекторе: рукоятки крана эжектора и дозатора, блок тахометра.",q:[QCOLL]},
+ 5:{p:"Рукоятка крана эжектора на панели: «откр» и «закр».",q:[Q("Рукоятка крана эжектора имеет два положения: \"откр\" и \"закр\".",RE38)]},
+ 8:{p:"Рукоятка дозатора: шкала с фиксированными положениями на 3 % и 6 %.",q:[Q("Шкала дозатора имеет несколько фиксированных положений, соответствующих заданной концентрации водного раствора пенообразователя 3% или 6%…",RE38)]},
+ 6:{p:"Блок индикации тахометра на панели: обороты и наработка.",q:[Q("Тахометр ТС-1 состоит из блока индикации 6 (рис.1), размещенного на панели управления 4, и датчика 2 (рис.2), установленного на корпусе насоса.","РЭ насоса, п. 3.10")]},
+ 12:{p:"Манометр на выходе ступени НД.",q:[QGAUGE]},
+ 18:{p:"Манометр на выходе ступени ВД.",q:[QGAUGE]},
+ 19:{p:"Мановакуумметр на входе в насос: показывает разрежение при заборе из водоёма и давление при работе от гидранта.",q:[QGAUGE]}
+}};
+META.ps={info:{
+ 1:{p:"Кран включения эжектора: пускает воду из коллектора к соплу.",q:[QEJ]},
+ 13:{p:"Корпус эжектора: камера, где струя из сопла подхватывает пенообразователь.",q:[QEJ]},
+ 14:{p:"Сопло: разгоняет воду из коллектора, за ним создаётся разрежение.",q:[QEJ]},
+ 10:{p:"Диффузор: смесь воды и пенообразователя тормозится и уходит во всасывающую полость ступени НД (в крышку 12).",q:[QFOAM,QEJ]},
+ 2:{p:"Дозатор с регулирующей заслонкой 6 задаёт подачу пенообразователя.",q:[Q("Регулирование подачи пенообразователя обеспечивается изменением проходного сечения подающей магистрали при изменении угла поворота заслонки 6 от 0 до 90º.",RE38)]},
+ 6:{p:"Заслонка дозатора: поворот 0…90° меняет сечение подачи пенообразователя.",q:[Q("Регулирование подачи пенообразователя обеспечивается изменением проходного сечения подающей магистрали при изменении угла поворота заслонки 6 от 0 до 90º.",RE38)]},
+ 4:{p:"Обратный лепестковый клапан: не пускает воду в пенобак.",q:[Q("Обратный лепестковый клапан предотвращает доступ воды в пенобак при работе от гидранта в случаях, когда закрывают кран эжектора или останавливают насос, не закрыв предварительно кран подачи пенообразователя из пенобака в насос.",RE38)]},
+ 3:{p:"Патрубок подвода пенообразователя (поз. 11 на рис. 1) — от пенобака или посторонней ёмкости.",q:[QFOAM]},
+ 8:{p:"Переводной патрубок: от дозатора к камере эжектора.",q:[QEJ]}
+}};
 const NAMES={nd:FIG.nd.D.parts,hp:FIG.hp.D.parts};
 
 const $=s=>document.querySelector(s);
@@ -440,15 +480,16 @@ new MutationObserver(themeChange).observe(document.documentElement,{attributes:t
 
 // ---------- 3D ----------
 const HOW3=`<h2>Что показано</h2>
-<p>Модель собрана по рисункам 1, 2 и 5 РЭ насоса: ступень нормального давления с улиткой и муфтой, сбоку сверху — ступень высокого давления с редуктором. Секущая плоскость проходит через оси обоих валов.</p>
-<p>Ползунок «Вал НД» крутит вал ступени НД. Кнопка «Ступень ВД» включает муфту 5: начинают вращаться барабан муфты, промежуточное колесо 23 и вал-шестерня ступени ВД — в 2,33 раза быстрее вала НД.</p>
-<div class="key"><span><span class="sw" style="background:var(--water)"></span>вода</span><span><span class="sw" style="background:var(--cool)"></span>охлаждение вала ВД</span><span><span class="sw" style="background:var(--hp)"></span>муфта включена</span></div>
-<p class="note">Точность модели около ±2 мм по рисункам РЭ. Лопатки колеса НД и колёса ВД упрощены, патрубок 29 и коллекторы не показаны. Вращение замедлено.</p>`;
+<p>Модель собрана по рисункам РЭ: ступень НД (рис. 2), ступень ВД с редуктором (рис. 5), обвязка по общему виду (рис. 1) и пеносмеситель (рис. 10). Сверху — коллектор 3 с вентилями 1 и 10, панелью и приборами; от него патрубок 29 идёт к ступени ВД, а на её выходе стоит коллектор 22 с краном 23 и перепускным клапаном 21.</p>
+<p>Секущая плоскость идёт вдоль вала. «По оси НД» разрезает ступень НД, коллектор и пеносмеситель, «по оси ВД» — ступень ВД. «Ступень ВД» включает муфту 5: вал ВД крутится в 2,33 раза быстрее, вода идёт по патрубку 29 и выходит через кран 23. «Пена» открывает кран эжектора: струя из коллектора через сопло подсасывает пенообразователь через дозатор и сбрасывает смесь во всасывание ступени НД.</p>
+<div class="key"><span><span class="sw" style="background:var(--water)"></span>вода</span><span><span class="sw" style="background:var(--foam)"></span>пенообразователь</span><span><span class="sw" style="background:var(--cool)"></span>охлаждение вала ВД</span><span><span class="sw" style="background:var(--hp)"></span>муфта включена</span></div>
+<p class="note">Точность: ступени ±2 мм, обвязка ±5–10 мм (по общему виду, без размеров). Лопатки колеса НД, колёса ВД и внутренности вентилей упрощены, направление выхода вентиля 10 условное. Вакуумный агрегат не показан. Вращение замедлено.</p>`;
 let V3=null;
-const NUM=s=>{const m=/^(?:ВД )?(\d+)\s/.exec(s);return m?+m[1]:null};
-function partInfo(name){const hpP=name.startsWith('ВД '),n=NUM(name);const M=META[hpP?'hp':'nd'];return {n,inf:n!=null?M.info[n]:null,fig:hpP?'Ступень ВД, рис. 5':'Ступень НД, рис. 2'}}
-function cleanName(s){return s.replace(/^ВД /,'').replace(/^\d+\s+/,'')}
-const GRP3=[["Ступень НД: проточная часть",/^(14 |12 |13 |11 |Гайка крепления|20 |16 Кран)/],["Ступень НД: вал, опоры, сальник",/^(Вал$|Гайка конца|1 |3 |4 |9 |25 |26 |24 |2 |15 |17 |10 |Гильза|Нажимное|18 |Щуп)/],["Привод ступени ВД",/^(5 |Барабан|6 |19 |8 )/],["Ступень ВД",/^ВД /],["Крепёж",/./]];
+const NUM=s=>{const m=/^(?:ВД |ПС |П )?(\d+)\s/.exec(s);return m?+m[1]:null};
+function partInfo(name){const n=NUM(name);const k=name.startsWith('ВД ')?'hp':name.startsWith('ПС ')?'ps':name.startsWith('П ')?'p1':'nd';const M=META[k];
+  return {n,inf:n!=null?M.info[n]:null,fig:{hp:'Ступень ВД, рис. 5',nd:'Ступень НД, рис. 2',p1:'Обвязка, рис. 1',ps:'Пеносмеситель, рис. 10'}[k]}}
+function cleanName(s){return s.replace(/^(ВД|ПС|П) /,'').replace(/^\d+\s+/,'')}
+const GRP3=[["Коллекторы, вентили, приборы (рис. 1)",/^П /],["Пеносмеситель (рис. 10)",/^ПС /],["Ступень НД: проточная часть",/^(14 |12 |13 |11 |Гайка крепления|20 |16 Кран)/],["Ступень НД: вал, опоры, сальник",/^(Вал$|Гайка конца|1 |3 |4 |9 |25 |26 |24 |2 |15 |17 |10 |Гильза|Нажимное|18 |Щуп)/],["Привод ступени ВД",/^(5 |Барабан|6 |19 |8 )/],["Ступень ВД",/^ВД /],["Крепёж",/./]];
 function init3D(){
   if(V3)return;
   if(typeof THREE==='undefined'){$('#v3msg').textContent='3D недоступно: не загрузилась библиотека.';return}
@@ -460,33 +501,36 @@ function init3D(){
   const d1=new THREE.DirectionalLight(0xffffff,.85);d1.position.set(1.5,3,-1);scene.add(d1);
   const d2=new THREE.DirectionalLight(0xffffff,.35);d2.position.set(-2,1,2);scene.add(d2);
   const ctl=new THREE.OrbitControls(cam,R.domElement);ctl.enableDamping=true;ctl.dampingFactor=.12;ctl.minDistance=.25;ctl.maxDistance=3;
-  // секущая плоскость через оси НД и ВД
-  const U=new THREE.Vector3(0,.9635,-.2676);const plane=new THREE.Plane(U.clone().negate(),0);
+  // секущая плоскость: вертикальная, вдоль вала; остаётся часть Y ≤ c (в координатах РЭ), т.е. z(glTF) ≥ −c.
+  // c = 0 — через ось НД (и коллектор, и пеносмеситель), c = −198 мм — через ось ВД
+  const plane=new THREE.Plane(new THREE.Vector3(0,0,1),0);
   const bin=Uint8Array.from(atob(MODEL_BIN),c=>c.charCodeAt(0)).buffer;
   const lo=MODEL.lo,s3=MODEL.sc;
   const AX={nd:new THREE.Vector3(0,0,0),hp:new THREE.Vector3(0,.055,.198),g23:new THREE.Vector3(0,.0331,.119)};
   const parts=[],pick=[];
-  // разборка: смещения только в секущей плоскости (вдоль оси X и вдоль W — от оси НД к оси ВД), чтобы детали не уходили за разрез
-  const WV=new THREE.Vector3(0,.2676,.9635);
+  // разборка: обвязка — вверх, ступень ВД — назад и вниз, детали НД — вдоль вала
   const ex=(n)=>{
-    let x=0,w=0;
-    if(/^(12 |13 |Шпильки|Болты|11 )/.test(n))x=.16;
-    else if(/^(14 |Гайка крепления)/.test(n))x=.09;
-    else if(/^(15 |17 |Нажимное|Гильза|10 )/.test(n))x=.045;
-    else if(/^(1 |Гайка конца|26 |25 |3 |24 |2 |4 )/.test(n))x=-.08;
-    else if(/^(5 |Барабан|6 |19 )/.test(n))w=-.12;
-    else if(/^8 /.test(n))w=-.2;
-    else if(/^ВД /.test(n)){w=.16;
-      if(/^ВД 14/.test(n))x=.14;else if(/^ВД (16|15)/.test(n))x=.09;else if(/^ВД (18|17|Гайка)/.test(n))x=.05;
-      else if(/^ВД (30|Штуцер)/.test(n))x=-.07;else if(/^ВД (23|25|24)/.test(n))w=.06;else if(/^ВД Кронштейн/.test(n))w=.1}
-    return [x,WV.y*w,WV.z*w]};
+    if(/^ПС /.test(n))return [.04,.24,0];
+    if(/^П (4|5|8|6) /.test(n))return [.08,.29,0];
+    if(/^П (29|22|23|21)/.test(n))return [-.18,.12,.03];
+    if(/^П /.test(n))return [0,.2,0];
+    if(/^(12 |13 |Шпильки|Болты|11 )/.test(n))return [.16,0,0];
+    if(/^(14 |Гайка крепления)/.test(n))return [.09,0,0];
+    if(/^(15 |17 |Нажимное|Гильза|10 )/.test(n))return [.045,0,0];
+    if(/^(1 |Гайка конца|26 |25 |3 |24 |2 |4 )/.test(n))return [-.08,0,0];
+    if(/^(5 |Барабан|6 |19 )/.test(n))return [0,-.16,0];
+    if(/^8 /.test(n))return [0,-.24,0];
+    if(/^ВД /.test(n)){let x=-.34,y=-.03,z=.04;
+      if(/^ВД 14/.test(n))x+=.14;else if(/^ВД (16|15)/.test(n))x+=.09;else if(/^ВД (18|17|Гайка)/.test(n))x+=.05;
+      else if(/^ВД (30|Штуцер)/.test(n))x-=.07;else if(/^ВД (23|25|24)/.test(n)){y=-.14}else if(/^ВД Кронштейн/.test(n))z=.1;return [x,y,z]}
+    return [0,0,0]};
   const rotOf=n=>{
     if(/^(Вал$|Гайка конца|1 Полумуфта|24 Ротор|14 |Гайка крепления|Гильза|5 Муфта фрикционная: стальные|6 Гайка)/.test(n))return ['nd',1];
     if(/^(Барабан|5 Муфта фрикционная: фрикционные)/.test(n))return ['nd',1,'clutch'];
     if(/^ВД (4 |18 |16 |Гайка|Зубчатый)/.test(n))return ['hp',1,'clutch'];
     if(/^ВД 23/.test(n))return ['g23',-1,'clutch'];
     return null};
-  const glassRe=/^(20 |12 |ВД 14|ВД 5 |25 Корпус|ВД 30|ВД Кронштейн)/;
+  const glassRe=/^(20 |12 |ВД 14|ВД 5 |25 Корпус|ВД 30|ВД Кронштейн|П 3 |П 1 Вентиль напорный|П 10 Вентиль напорный|ПС 13|ПС 1 |ПС 2 |ПС 10)/;
   for(const p of MODEL.parts){
     const q=new Uint16Array(bin,p.p,p.nv*3),pos=new Float32Array(p.nv*3);for(let i=0;i<pos.length;i++)pos[i]=lo[i%3]+q[i]*s3[i%3];
     const nq=new Int8Array(bin,p.n,p.nv*3),nor=new Float32Array(p.nv*3);for(let i=0;i<nor.length;i++)nor[i]=nq[i]/127;
@@ -499,19 +543,32 @@ function init3D(){
     const holder=new THREE.Group(),pivot=new THREE.Group();pivot.position.copy(ax);
     const m=new THREE.Mesh(g,mat),mc=new THREE.Mesh(g,cap);m.position.copy(ax).negate();mc.position.copy(ax).negate();
     pivot.add(m,mc);holder.add(pivot);scene.add(holder);
-    const P={name:p.name,mat,cap,holder,pivot,rot:r,ex:ex(p.name),glass:glassRe.test(p.name),col,i:parts.length};m.userData.P=P;parts.push(P);pick.push(m);
+    const P={name:p.name,mat,cap,holder,pivot,rot:r,ex:ex(p.name),glass:glassRe.test(p.name),pipe:/^П/.test(p.name),col,i:parts.length};m.userData.P=P;parts.push(P);pick.push(m);
   }
   // вода: частицы
-  const NND=380,NHP=260,NC=70,NT=NND+NHP+NC;
+  const XG=px=>(318+(px-1515)/3.9)/1000, ND=v=>v/1000;
+  const out=new THREE.Vector3();
+  const fc=(x,Y,Z)=>out.set(x,Z,-Y); // координаты РЭ (X вдоль вала, Y вправо со стороны всасывания, Z вверх), м -> glTF
+  const polar=(x,r,a,cy,cz)=>fc(x,cy+r*Math.sin(a),cz+r*Math.cos(a));
+  // потоки по трубам обвязки (мм, координаты РЭ): [точки, радиус разброса, вес, когда показывать, цвет]
+  const D45=[0,.72,-.69];
+  const SR=[
+    [[[367,78,215],[380,78,262],[400,30,290],[400,-150,290],[430,-201,290],[495,-201,290],[495,-201-72,290-69],[495,-201-110,290-105]],14,1,'nd','w'],
+    [[[367,78,215],[380,78,262],[400,140,290],[400,230,290],[430,261,290],[495,261,290],[495,261+72,290-69],[495,261+110,290-105]],14,1,'nd','w'],
+    [[[400,-60,300],[400,-140,300],[348,-140,300],[173,-140,300],[173,-198,300],[173,-198,222]],10,.8,'hp','w'],
+    [[[272,-198,222],[272,-198,490],[272,-198,575]],6,.6,'hp','w'],
+    [[[415,0,350],[415,0,478],[479,0,478],[479,0,372],[479,0,300],[479,0,200],[479,0,112],[479,0,40]],5,.7,'foam','w'],
+    [[[479,330,410],[479,153,410],[479,108,410],[479,108,335],[479,26,335],[479,0,315],[479,0,200],[479,0,112],[479,0,40]],6,.6,'foam','f']
+  ].map(([pts,r,wgt,cond,col])=>{const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1],pts[i][2]-pts[i-1][2]));return {pts,L,len:L[L.length-1],r,cond,col,n:Math.round(wgt*L[L.length-1]/7)}});
+  function pS(S_,s,j){const s1=s*S_.len;let i=1;while(i<S_.L.length-1&&S_.L[i]<s1)i++;const a=S_.pts[i-1],b=S_.pts[i],k=(s1-S_.L[i-1])/(S_.L[i]-S_.L[i-1]||1);
+    return fc(ND(a[0]+(b[0]-a[0])*k+j[0]*S_.r),ND(a[1]+(b[1]-a[1])*k+j[1]*S_.r),ND(a[2]+(b[2]-a[2])*k+j[2]*S_.r))}
+  const NND=380,NHP=260,NC=70,NS=SR.reduce((a,s)=>a+s.n,0),NT=NND+NHP+NC+NS;
+  const sOf=new Int16Array(NT).fill(-1);{let i=NND+NHP+NC;SR.forEach((s,k)=>{for(let m=0;m<s.n;m++)sOf[i++]=k})}
   const pg=new THREE.BufferGeometry(),pp=new Float32Array(NT*3),pc=new Float32Array(NT*3);
   pg.setAttribute('position',new THREE.BufferAttribute(pp,3));pg.setAttribute('color',new THREE.BufferAttribute(pc,3));
   const pm=new THREE.PointsMaterial({size:.0075,vertexColors:true,clippingPlanes:[plane],transparent:true,opacity:.95,depthWrite:false});
   const pts=new THREE.Points(pg,pm);pts.frustumCulled=false;scene.add(pts);
   const seed=new Float32Array(NT*3);for(let i=0;i<seed.length;i++)seed[i]=Math.random();
-  const XG=px=>(318+(px-1515)/3.9)/1000, ND=v=>v/1000;
-  const out=new THREE.Vector3();
-  const fc=(x,Y,Z)=>out.set(x,Z,-Y); // FreeCAD мм -> glTF м уже в метрах
-  const polar=(x,r,a,cy,cz)=>fc(x,cy+r*Math.sin(a),cz+r*Math.cos(a));
   const A38=38*Math.PI/180;
   function pND(s,a,b,c){
     if(s<.35){const t=s/.35;return polar(ND(560-160*t),ND(8+b*48),a,0,0)}
@@ -522,23 +579,23 @@ function init3D(){
   const Y0=-.198,Z0=.055;
   function pHP(s,a,b,c){
     const st=b<.5?0:1;
-    if(c<.18){ // вход и выход сверху
-      const inl=b<.5,x=XG(inl?1072:1245)+(a/6.28-.5)*.03;const t=inl?s:1-s;return polar(x,.19-.07*t,0,Y0,Z0)}
+    if(c<.18){ // вход (патрубок 29) и выход (коллектор 22) сверху
+      const inl=b<.5,x=(inl?.173:.272)+(a/6.28-.5)*.02;const t=inl?s:1-s;return polar(x,.17-.07*t,0,Y0,Z0)}
     const x=XG(st?1257:1100)+(c-.5)*.012;return polar(x,.03+.058*s,a-1.4*s,Y0,Z0)}
   function pCool(s,a,b){return polar(XG(150+1290*s),.0045*b,a,Y0,Z0)}
-  const cW=new THREE.Color(),cC=new THREE.Color();
-  const st={nd:0,hp:0,g23:0,cl:0,ph:new Float32Array(NT),sel:null,hl:null,water:true};
+  const cW=new THREE.Color(),cC=new THREE.Color(),cF=new THREE.Color();
+  const st={nd:0,hp:0,g23:0,cl:0,ph:new Float32Array(NT),sel:null,hl:null,water:true,foam:false,pipes:true};
   for(let i=0;i<NT;i++)st.ph[i]=Math.random();
-  function setColors(){cW.set(colors.water||'#2e86d1').convertSRGBToLinear();cC.set(colors.cool||'#c04fc4').convertSRGBToLinear();
-    for(let i=0;i<NT;i++){const c=i>=NND+NHP?cC:cW;pc[i*3]=c.r;pc[i*3+1]=c.g;pc[i*3+2]=c.b}pg.attributes.color.needsUpdate=true;
+  function setColors(){cW.set(colors.water||'#2e86d1').convertSRGBToLinear();cC.set(colors.cool||'#c04fc4').convertSRGBToLinear();cF.set(tok('--foam')||'#c9a41c').convertSRGBToLinear();
+    for(let i=0;i<NT;i++){const k=sOf[i];const c=k>=0?(SR[k].col==='f'?cF:cW):i>=NND+NHP?cC:cW;pc[i*3]=c.r;pc[i*3+1]=c.g;pc[i*3+2]=c.b}pg.attributes.color.needsUpdate=true;
     scene.background=new THREE.Color(colors.scene||'#dfe5ea')}
   readColors();setColors();
   // вид по умолчанию: со стороны снятой половины
-  const C0=new THREE.Vector3(.27,.03,.08);
-  function home(){cam.up.set(0,-.2676,-.9635);cam.position.copy(C0).addScaledVector(U,1.05).addScaledVector(WV,-.2).add(new THREE.Vector3(.07,0,0));ctl.target.copy(C0);ctl.update()}
+  const C0=new THREE.Vector3(.25,.14,.03);
+  function home(){cam.up.set(0,1,0);cam.position.set(C0.x-.3,C0.y+.3,C0.z-1.55);ctl.target.copy(C0);ctl.update()}
   home();
-  let explode=0,cutV=.5,glass=false;
-  function applyCut(){plane.constant=cutV>=.999?10:(cutV-.5)*.7+.0015}
+  let explode=0,cutC=2,glass=false;
+  function applyCut(){plane.constant=cutC>=355?10:(cutC+1.5)/1000}
   function applyExplode(){for(const P of parts)P.holder.position.set(P.ex[0]*explode*.75,P.ex[1]*explode*.75,P.ex[2]*explode*.75)}
   function applyGlass(){for(const P of parts){if(!P.glass)continue;P.mat.transparent=glass;P.mat.opacity=glass?.22:1;P.mat.depthWrite=!glass;P.cap.visible=!glass;P.mat.needsUpdate=true}}
   function highlight(P){if(st.hl)st.hl.mat.emissive.setHex(0);st.hl=P;if(P)P.mat.emissive.set(colors.accent).multiplyScalar(.35)}
@@ -558,6 +615,7 @@ function init3D(){
       st.nd+=w;if(on){st.hp+=w*2.33;st.g23-=w}
       st.cl+=((on?1:0)-st.cl)*Math.min(1,dt*6);
       for(const P of parts){if(!P.rot)continue;const [a,dir,cl]=P.rot;P.pivot.rotation.x=a==='nd'?(cl?(P.cAng=(P.cAng||0)+(on?w:0)):st.nd):a==='hp'?st.hp:st.g23}
+      for(const P of parts)if(/^П 5 |^ПС (1|14|10) /.test(P.name)&&st.hl!==P){P.mat.emissive.set(tok('--foam')).multiplyScalar(st.foam&&S.rpm>0?.35:0)}
       for(const P of parts)if(/^(5 Муфта|Барабан)/.test(P.name)){P.mat.emissive.set(colors.hp).multiplyScalar(.45*st.cl);if(st.hl===P)P.mat.emissive.set(colors.accent).multiplyScalar(.35)}
       // частицы
       pts.visible=st.water&&S.rpm>0&&explode<.05;
@@ -565,11 +623,14 @@ function init3D(){
         for(let i=0;i<NT;i++){
           let v;if(i<NND){st.ph[i]=(st.ph[i]+sp)%1;v=pND(st.ph[i],seed[i*3]*6.283,seed[i*3+1],seed[i*3+2])}
           else if(i<NND+NHP){if(on)st.ph[i]=(st.ph[i]+sp*1.6)%1;v=pHP(st.ph[i],seed[i*3]*6.283,seed[i*3+1],seed[i*3+2]);if(!on&&seed[i*3+2]<.18)v.set(0,-9,0)}
-          else{if(on)st.ph[i]=(st.ph[i]+sp*1.2)%1;v=pCool(st.ph[i],seed[i*3]*6.283,seed[i*3+1]);if(!on)v.set(0,-9,0)}
+          else if(i<NND+NHP+NC){if(on)st.ph[i]=(st.ph[i]+sp*1.2)%1;v=pCool(st.ph[i],seed[i*3]*6.283,seed[i*3+1]);if(!on)v.set(0,-9,0)}
+          else{const Sx=SR[sOf[i]],act=st.pipes&&(Sx.cond==='nd'||(Sx.cond==='hp'&&on)||(Sx.cond==='foam'&&st.foam));
+            if(act){st.ph[i]=(st.ph[i]+sp*1.5*900/Sx.len)%1;v=pS(Sx,st.ph[i],[seed[i*3]-.5,seed[i*3+1]-.5,seed[i*3+2]-.5])}else v=out.set(0,-9,0)}
           pp[i*3]=v.x;pp[i*3+1]=v.y;pp[i*3+2]=v.z}
         pg.attributes.position.needsUpdate=true}
       ctl.update();R.render(scene,cam)},
-    setCut(v){cutV=v;applyCut()},setExplode(v){explode=v;applyExplode()},setGlass(v){glass=v;applyGlass()},setWater(v){st.water=v}
+    setCut(v){cutC=v;applyCut()},setExplode(v){explode=v;applyExplode()},setGlass(v){glass=v;applyGlass()},setWater(v){st.water=v},
+    setFoam(v){st.foam=v},setPipes(v){st.pipes=v;for(const P of parts)if(P.pipe)P.holder.visible=v}
   };
   V3.size();
 }
@@ -590,7 +651,11 @@ function sel3(i){
   if(i==null){V3.highlight(null);$('#det').innerHTML='<h2>Выбрано</h2><p class="note">Нажмите деталь на модели или в списке.</p>';return}
   const P=V3.parts[i];V3.highlight(P);const {n,inf,fig}=partInfo(P.name);$('#det').innerHTML=detHTML(n,cleanName(P.name),inf,fig);
 }
-$('#cut').addEventListener('input',e=>{const v=+e.target.value/100;$('#cutOut').textContent=v>=1?'без разреза':Math.abs(v-.5)<.01?'по осям':(v<.5?'глубже':'ближе');if(V3)V3.setCut(v)});
+function setCutUI(s){$('#cut').value=s;const c=360-s;$('#cutOut').textContent=c>=355?'без разреза':Math.abs(c-2)<10?'по оси НД':Math.abs(c+198)<10?'по оси ВД':(c>0?'+':'')+c+' мм';if(V3)V3.setCut(c)}
+$('#cut').addEventListener('input',e=>setCutUI(+e.target.value));
+document.querySelectorAll('[data-cut]').forEach(b=>b.onclick=()=>setCutUI(+b.dataset.cut));
+const tgl=(id,f)=>{$(id).onclick=e=>{const v=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',v);if(V3)f(v)}};
+tgl('#foam3',v=>V3.setFoam(v));tgl('#pipes3',v=>V3.setPipes(v));
 $('#exp').addEventListener('input',e=>{const v=+e.target.value/100;$('#expOut').textContent=v<.01?'собран':Math.round(v*100)+' %';if(V3)V3.setExplode(v)});
 $('#glass').onclick=e=>{const v=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',v);if(V3)V3.setGlass(v)};
 $('#w3').onclick=e=>{const v=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',v);if(V3)V3.setWater(v)};
