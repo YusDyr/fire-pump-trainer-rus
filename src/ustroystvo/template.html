@@ -208,8 +208,9 @@ const META={
     q:[QDRIVE,Q("Регулирование фрикционной муфты привода ступени высокого давления заключается в обеспечении требуемого передаваемого момента 16…18 кгс ·м","РЭ насоса, п. 8.2")]},
  6:{p:"Гайкой настраивают момент, который передаёт муфта.",q:[Q("Регулирование передаваемого муфтой момента производится гайкой 4 через специальное окно в корпусе ступени нормального давления, закрытое крышкой 5.","РЭ насоса, п. 3.5 (позиции по рис. 8)")]},
  7:{p:"Стопорные болты фиксируют регулировочную гайку.",q:[Q("Стопорение гайки производится 3-мя болтами 3.","РЭ насоса, п. 3.5 (позиции по рис. 8)")]},
- 8:{p:"Вилка механизма включения муфты. Её поворачивает рукоятка 13 на рис. 1 (рукоятка включения привода ступени высокого давления)."},
- 19:{p:"Втулка нажимная в механизме включения муфты."},
+ 8:{p:"Вилка механизма включения муфты (на рис. 8 — вилка 11 на валу 10). Рукоятка включения поворачивает вал с вилкой, ролики на концах вилки сдвигают нажимную втулку 19 вдоль вала, втулка сжимает диски муфты 5 — привод ступени ВД включается. Рукоятку держит в положении пружинный фиксатор. Нажмите «Ступень ВД», чтобы увидеть включение.",
+    q:[Q("3.5. Механизм включения ступени высокого давления состоит из фрикционной муфты 5 (рис.2) и механизма включения фрикционной муфты, показанного на рис. 8.","РЭ насоса, п. 3.5"),Q("1 – рукоятка включения;  2 – пружинный фиксатор; … 10 – вал;  11 – вилка;  12 – шпонка; … 18 – подшипник 1000095 ГОСТ 8338;  20 – ось","РЭ насоса, рис. 8"),Q("включить привод ступени высокого давления, опустив рукоятку 13 (рис.1) вниз до упора.","РЭ насоса, п. 5.13.2 к")]},
+ 19:{p:"Нажимная втулка: вилка 8 сдвигает её вдоль вала, и она сжимает пакет дисков муфты 5. При выключении втулка отходит, диски расходятся.",q:[Q("3.5. Механизм включения ступени высокого давления состоит из фрикционной муфты 5 (рис.2) и механизма включения фрикционной муфты, показанного на рис. 8.","РЭ насоса, п. 3.5")]},
  15:{p:"Набор колец из набивки, поджатых нажимной втулкой. Небольшая утечка через дренажное отверстие нужна для смазки и охлаждения колец.",
      q:[Q("Уплотнение вала обеспечивается сальниковым уплотнением, состоящим из набора уплотнительных колец (рис.3), поджимаемых в осевом направлении нажимным кольцом.",RE32),QDROPS]},
  26:{p:"Манжета на выходе вала со стороны полумуфты держит масло в корпусе.",q:[Q("16. Большой расход масла в масляной ванне редуктора — 1. Износ уплотнительных манжет — 1. Заменить манжеты","РЭ насоса, табл. 3")]},
@@ -290,7 +291,7 @@ const NAMES={nd:FIG.nd.D.parts,hp:FIG.hp.D.parts};
 const $=s=>document.querySelector(s);
 const cv=$('#cv'), ctx=cv.getContext('2d');
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const S={tab:'nd',rpm:1500,hp:false,play:!reduce,layers:{water:true,oil:true,shaft:true,cool:true},hover:null,t:0};
+const S={tab:'nd',rpm:1500,hp:false,eng:0,play:!reduce,layers:{water:true,oil:true,shaft:true,cool:true},hover:null,t:0};
 let F=null, sc=1, W=0, H=0, under=null, inkS=null, shaftS=null, oilS=null, tmp=null, tctx=null, colors={};
 
 function tok(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
@@ -321,6 +322,16 @@ function buildLayers(){
   readColors();const f=F,R=f.raw;
   f.C={ink:layerFrom(f,R.ink,colors.ink,1),water:layerFrom(f,R.water,colors.water,.42),oil:layerFrom(f,R.oil,colors.oil,.62),shaftM:layerFrom(f,R.shaft,'#000',1),cool:layerFrom(f,R.cool,colors.cool,.5)};
   f.Ckey=colors.ink+colors.water;
+  // механизм включения ступени ВД на рис. 2: муфта 5, вилка 8, втулка 19 — отдельными спрайтами, чтобы двигать их
+  f.SP=null;f.C.inkBase=null;
+  if(f.D.clutchAnim){
+    const ids=f.D.clutchAnim,p=R.pid,a=R.ink.slice();f.SP={};
+    for(const k of ids){let x0=1e9,y0=1e9,x1=-1,y1=-1,sx=0,sy=0,n=0;
+      for(let i=0;i<p.length;i++)if(p[i]===k){const x=i%f.IW,y=(i/f.IW)|0;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;sx+=x;sy+=y;n++}
+      if(!n)continue;const w=x1-x0+1,h=y1-y0+1,c=document.createElement('canvas');c.width=w;c.height=h;const cx_=c.getContext('2d'),id=cx_.createImageData(w,h),[r,g,b]=rgb(colors.ink);
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y0+y)*f.IW+x0+x;if(p[i]!==k)continue;const j=(y*w+x)*4;id.data[j]=r;id.data[j+1]=g;id.data[j+2]=b;id.data[j+3]=R.ink[i];a[i]=0}
+      cx_.putImageData(id,0,0);f.SP[k]={c,x0,y0,w,h,cx:sx/n,cy:sy/n}}
+    f.C.inkBase=layerFrom(f,a,colors.ink,1)}
   resize();
 }
 function resize(){
@@ -332,7 +343,7 @@ function resize(){
   if(S.layers.water)u.drawImage(f.C.water,0,0,W,H);
   if(S.layers.cool&&f.D.cool)u.drawImage(f.C.cool,0,0,W,H);
   if(S.layers.oil&&!f.D.oilTop)u.drawImage(f.C.oil,0,0,W,H);
-  inkS=mk();inkS.getContext('2d').drawImage(f.C.ink,0,0,W,H);
+  inkS=mk();inkS.getContext('2d').drawImage(f.C.inkBase||f.C.ink,0,0,W,H);
   shaftS=mk();shaftS.getContext('2d').drawImage(f.C.shaftM,0,0,W,H);
   oilS=mk();oilS.getContext('2d').drawImage(f.C.oil,0,0,W,H);
   tmp=mk();tctx=tmp.getContext('2d');
@@ -342,7 +353,9 @@ function resize(){
 function mkPath(pts){let L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));return {pts,L,len:L[L.length-1],n:Math.max(2,Math.round(L[L.length-1]/70))}}
 function at(P,s){let i=1;while(i<P.L.length-1&&P.L[i]<s)i++;const a=P.pts[i-1],b=P.pts[i],k=(s-P.L[i-1])/(P.L[i]-P.L[i-1]||1);return [a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k,Math.atan2(b[1]-a[1],b[0]-a[0])]}
 let flow=0, flowHP=0, coolF=0, shaftPh=0, hpPh=0, drops=[], dropT=0, tachoPh=0;
-const hpOn=()=>S.hp&&S.rpm>0;
+// S.eng — положение механизма включения: 0 — выключено, 1 — диски сжаты; привод ВД работает только при полном включении
+const hpOn=()=>S.eng>.95&&S.rpm>0;
+const ease=e=>e<.5?2*e*e:1-2*(1-e)*(1-e);
 
 function stripes(box,phase,col,dir){
   const X=v=>v*sc,x0=X(box[0]),y0=X(box[1]),w=X(box[2]-box[0]),h=X(box[3]-box[1]);
@@ -383,7 +396,7 @@ function draw(dt){
   }
   if(S.layers.shaft)stripes(D.shaftBox,nd?shaftPh:hpPh,null,1);
   if(nd){
-    if(S.hp){const pu=.28+.14*Math.sin(S.t*6);ctx.fillStyle=colors.hp;ctx.globalAlpha=pu;for(const r of D.clutch)ctx.fillRect(X(r[0]),X(r[1]),X(r[2]-r[0]),X(r[3]-r[1]));ctx.globalAlpha=1}
+    if(S.eng>.95){const pu=.28+.14*Math.sin(S.t*6);ctx.fillStyle=colors.hp;ctx.globalAlpha=pu;for(const r of D.clutch)ctx.fillRect(X(r[0]),X(r[1]),X(r[2]-r[0]),X(r[3]-r[1]));ctx.globalAlpha=1}
     if(S.layers.water&&S.rpm>0)particles(F.PATHS,flow,colors.waterD,15,5);
   }else{
     // промежуточное колесо 23: полосы бегут навстречу валу
@@ -398,6 +411,19 @@ function draw(dt){
   // подсветка выбранной и наведённой детали — вся область детали
   for(const [n,a] of [[S.hover,.2],[F.sel,.42]]){const L=n!=null&&regionLayer(n);if(L){ctx.globalAlpha=a+(n===F.sel?.08*Math.sin(S.t*4):0);ctx.drawImage(L,0,0,W,H);ctx.globalAlpha=1}}
   ctx.drawImage(inkS,0,0);
+  if(nd&&F.SP){const e=ease(S.eng),sp=F.SP;
+    // втулка 19 уходит к муфте, пакет дисков 5 сжимается, вилка 8 поворачивается
+    const act=S.hp||S.eng>0, tint=(k,dx,sx)=>{const L=regionLayer(k,colors.hp);if(!L||!act)return;ctx.globalAlpha=.32*Math.min(1,S.eng*3+(S.hp?.3:0));
+      ctx.drawImage(L,sp[k].x0,sp[k].y0,sp[k].w,sp[k].h,X(sp[k].x0+dx),X(sp[k].y0),X(sp[k].w*sx),X(sp[k].h));ctx.globalAlpha=1};
+    if(sp[19]){tint(19,-24*e,1);ctx.drawImage(sp[19].c,X(sp[19].x0-24*e),X(sp[19].y0),X(sp[19].w),X(sp[19].h))}
+    if(sp[5]){tint(5,0,1-.08*e);ctx.drawImage(sp[5].c,X(sp[5].x0),X(sp[5].y0),X(sp[5].w*(1-.08*e)),X(sp[5].h))}
+    if(sp[8]){const s=sp[8],th=(-6+20*e)*Math.PI/180;ctx.save();ctx.translate(X(s.cx),X(s.cy));ctx.rotate(-th);ctx.drawImage(s.c,X(s.x0-s.cx),X(s.y0-s.cy),X(s.w),X(s.h));ctx.restore();
+      // схема вилки поверх разреза: скоба от оси вилки до роликов на уровне оси вала (в плоскости, перпендикулярной чертежу)
+      if(act||F.sel===8){const Lr=D.axisY-s.cy,ex=s.cx-Lr*Math.sin(th),ey=s.cy+Lr*Math.cos(th);
+        ctx.strokeStyle=colors.hp;ctx.globalAlpha=.85;ctx.lineWidth=X(12);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(X(s.cx),X(s.cy));ctx.lineTo(X(ex),X(ey));ctx.stroke();
+        ctx.fillStyle=colors.hp;ctx.beginPath();ctx.arc(X(ex),X(ey),X(14),0,7);ctx.fill();ctx.beginPath();ctx.arc(X(s.cx),X(s.cy),X(10),0,7);ctx.fill();ctx.globalAlpha=1;
+        if(S.eng>0&&S.eng<1){const ax=X(sp[19].x0-24*e-10),ay=X(D.axisY+150);ctx.strokeStyle=colors.hp;ctx.lineWidth=X(6);ctx.beginPath();ctx.moveTo(ax+X(S.hp?40:-40),ay);ctx.lineTo(ax,ay);ctx.stroke();
+          ctx.beginPath();const d=S.hp?1:-1;ctx.moveTo(ax-X(4)*d,ay);ctx.lineTo(ax+X(14)*d,ay-X(10));ctx.lineTo(ax+X(14)*d,ay+X(10));ctx.fillStyle=colors.hp;ctx.fill()}}}}
   if(nd){
     if(S.layers.water&&S.rpm>0)arrow([D.outlet[0][0],D.outlet[0][1]],[D.outlet[1][0],D.outlet[1][1]+20],colors.water,'к напорному коллектору');
     if(S.rpm>0&&S.play){dropT-=dt;if(dropT<=0){drops.push({y:0,v:0});dropT=1.15}}
@@ -405,7 +431,8 @@ function draw(dt){
     drops=drops.filter(d=>{if(S.play){d.v+=dt*900;d.y+=d.v*dt}const yy=D.drain[1]+d.y;if(d.y>140)return false;ctx.globalAlpha=1-d.y/140;ctx.beginPath();ctx.arc(X(D.drain[0]),X(yy),X(7),0,7);ctx.fill();return true});
     ctx.globalAlpha=1;
     if(S.rpm>0){const on=(tachoPh%1)<.5;ctx.fillStyle=colors.ok;ctx.globalAlpha=on?.9:.15;ctx.beginPath();ctx.arc(X(D.tacho[0][0]),X(D.tacho[0][1]-10),X(12),0,7);ctx.fill();ctx.globalAlpha=1}
-    if(S.hp)label('муфта 5 включена → редуктор ступени ВД',X(720),X(1240),'center',colors.hp,true);
+    if(S.eng>.95)label('муфта 5 включена → редуктор ступени ВД',X(720),X(1240),'center',colors.hp,true);
+    else if(S.eng>0)label(S.hp?'вилка 8 поворачивается → втулка 19 сжимает диски муфты 5':'втулка 19 отходит — диски муфты 5 расходятся',X(720),X(1240),'center',colors.hp,true);
   }else{
     if(S.layers.water&&hpOn()){
       arrow([D.inlet[0],D.inlet[1]-10],[D.inlet[0],D.inlet[1]+150],colors.water,'от коллектора НД ↓','right',[D.inlet[0]-34,D.inlet[1]+70]);
@@ -425,7 +452,7 @@ function label(t,x,y,al,col,box){
   if(box){const w=ctx.measureText(t).width,p=5*dpr,x0=al==='center'?x-w/2:al==='right'?x-w:x;const xx=Math.max(p,Math.min(W-w-p,x0));ctx.fillStyle=colors.bg;ctx.globalAlpha=.92;ctx.fillRect(xx-p,y-16*dpr-p/2,w+2*p,18*dpr+p);ctx.globalAlpha=1;ctx.textAlign='left';ctx.fillStyle=col;ctx.fillText(t,xx,y);return}
   ctx.fillStyle=col;ctx.fillText(t,x,y)}
 
-let last=0;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;if(S.tab==='m3')draw3(dt);else if(W)draw(dt);requestAnimationFrame(loop)}
+let last=0;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;S.eng=Math.max(0,Math.min(1,S.eng+(S.hp?1:-1)*dt*.9));if(S.tab==='m3')draw3(dt);else if(W)draw(dt);requestAnimationFrame(loop)}
 
 // ---------- UI ----------
 function fmtN(v){return v.toLocaleString('ru-RU').replace(/\s/g,' ')}
@@ -454,10 +481,10 @@ function select(n){F.sel=+n;document.querySelectorAll('[data-part]').forEach(b=>
   if(!inf)h+=`<p class="note">Позиция ${n} по легенде ${S.tab==='nd'?'рис. 2':'рис. 5'} РЭ насоса.</p>`;$('#det').innerHTML=h}
 
 function toImg(e){const r=cv.getBoundingClientRect();return [(e.clientX-r.left)/r.width*F.IW,(e.clientY-r.top)/r.height*F.IH]}
-function regionLayer(n){
-  const f=F;if(!f||!f.raw||!(f.D.regions||[]).includes(+n))return null;const key=n+colors.accent;if(f.hl[key])return f.hl[key];
+function regionLayer(n,col){col=col||colors.accent;
+  const f=F;if(!f||!f.raw||!(f.D.regions||[]).includes(+n))return null;const key=n+col;if(f.hl[key])return f.hl[key];
   const p=f.raw.pid,a=new Uint8Array(p.length);for(let i=0;i<p.length;i++)if(p[i]===+n)a[i]=255;
-  return f.hl[key]=layerFrom(f,a,colors.accent,1)}
+  return f.hl[key]=layerFrom(f,a,col,1)}
 function pickAt(x,y){
   const f=F;x=Math.round(x);y=Math.round(y);if(!f.raw||x<0||y<0||x>=f.IW||y>=f.IH)return nearest(x,y);
   // точно по области детали; рядом с линией — соседние пиксели; иначе — ближайшая позиция на чертеже
@@ -559,6 +586,25 @@ function init3D(){
     pivot.add(m,mc);holder.add(pivot);scene.add(holder);
     const P={name:p.name,mat,cap,holder,pivot,rot:r,ex:ex(p.name),glass:glassRe.test(p.name),pipe:/^П/.test(p.name),col,i:parts.length};m.userData.P=P;mc.userData.P=P;parts.push(P);pick.push(m,mc);
   }
+  // механизм включения муфты по рис. 8: вал вилки с рукояткой, вилка-скоба и ролики (в модели FreeCAD его нет — строим здесь)
+  const mech=(()=>{
+    const fcR=new THREE.Group();fcR.matrixAutoUpdate=false;fcR.matrix.set(.001,0,0,0, 0,0,.001,0, 0,-.001,0,0, 0,0,0,1);
+    const H=new THREE.Group();H.add(fcR);scene.add(H);
+    const col=new THREE.Color(.5,.5,.55).convertSRGBToLinear();
+    const mat=new THREE.MeshStandardMaterial({color:col,metalness:.05,roughness:.6,clippingPlanes:[plane]});
+    const cap=new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(.55),clippingPlanes:[plane],side:THREE.BackSide});
+    const piv=new THREE.Group();piv.position.set(221.9,0,49);fcR.add(piv);
+    const P={name:'8 Вилка с рукояткой включения (по рис. 8)',mat,cap,holder:H,pivot:piv,rot:null,ex:[0,-.24,0],glass:false,pipe:false,col,i:parts.length};
+    const add=(geo,pos,rotx,rotz)=>{for(const m of [new THREE.Mesh(geo,mat),new THREE.Mesh(geo,cap)]){m.position.set(...pos);if(rotx)m.rotation.x=rotx;if(rotz)m.rotation.z=rotz;m.userData.P=P;piv.add(m);pick.push(m)}};
+    // скоба вилки: полукольцо вокруг вала насоса от вала вилки до роликов по бокам
+    const pts=[];for(let a=-90;a<=90;a+=10){const r=a*Math.PI/180;pts.push(new THREE.Vector3(20,49*Math.sin(r),-49+49*Math.cos(r)))}
+    add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),40,5,10),[0,0,0]);
+    for(const s of [-1,1])add(new THREE.CylinderGeometry(7,7,6,20),[24,s*52,-49]);           // ролики (подшипники 18 на осях 20)
+    add(new THREE.CylinderGeometry(9,9,130,20),[0,140,0]);                                   // вал 10 вилки — наружу, к рукоятке
+    add(new THREE.CylinderGeometry(15,15,24,20),[0,205,0]);                                  // ступица рукоятки
+    add(new THREE.CylinderGeometry(7,7,250,16),[125,205,0],0,Math.PI/2);                     // рукоятка 1 (на рис. 1 — 13)
+    add(new THREE.SphereGeometry(20,24,16),[255,205,0]);                                    // шар рукоятки
+    parts.push(P);return P})();
   // вода: частицы
   const XG=px=>(318+(px-1515)/3.9)/1000, ND=v=>v/1000;
   const out=new THREE.Vector3();
@@ -629,6 +675,10 @@ function init3D(){
       const k=S.rpm/2700,w=S.play?dt*k*2*Math.PI*.9:0,on=hpOn();
       st.nd+=w;if(on){st.hp+=w*2.33;st.g23-=w}
       st.cl+=((on?1:0)-st.cl)*Math.min(1,dt*6);
+      // включение: рукоятка вниз → вилка поворачивается → ролики сдвигают втулку 19 к муфте → диски сжимаются
+      {const e=ease(S.eng),glow=(S.eng>0&&S.eng<1)||(S.hp&&S.eng<1)?.5:0;mech.pivot.rotation.y=(-4+10*e)*Math.PI/180;
+       for(const P of [mech,...parts.filter(P=>/^19 /.test(P.name))])if(st.hl!==P)P.mat.emissive.set(colors.hp).multiplyScalar(glow);
+       for(const P of parts){if(/^19 /.test(P.name))P.pivot.position.x=-.006*e;else if(/^5 Муфта фрикционная: стальные/.test(P.name))P.pivot.position.x=-.0025*e}}
       for(const P of parts){if(!P.rot)continue;const [a,dir,cl]=P.rot;P.pivot.rotation.x=a==='nd'?(cl?(P.cAng=(P.cAng||0)+(on?w:0)):st.nd):a==='hp'?st.hp:st.g23}
       for(const P of parts)if(/^П 5 |^ПС (1|14|10) /.test(P.name)&&st.hl!==P){P.mat.emissive.set(tok('--foam')).multiplyScalar(st.foam&&S.rpm>0?.35:0)}
       for(const P of parts)if(/^(5 Муфта|Барабан)/.test(P.name)){P.mat.emissive.set(colors.hp).multiplyScalar(.45*st.cl);if(st.hl===P)P.mat.emissive.set(colors.accent).multiplyScalar(.6)}
