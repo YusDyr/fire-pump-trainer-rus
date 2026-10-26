@@ -100,7 +100,9 @@ feat('Kryshka_12', _cv[1], asym.cover_extra(revolve_xy([(xmm(x), r) for x, r in 
 _b, _s = asym.fasteners()
 feat('Bolty_kryshki', 'Болты крышки M12 (8 шт.)', _b, (0.35,0.36,0.4))
 feat('Shpilki_vsasyvaniya', 'Шпильки фланца всасывания M16 (6 шт.)', _s, (0.35,0.36,0.4))
-feat('Kran_slivnoy_16', '16 Кран сливной', asym.drain_valve(), (0.75,0.6,0.2))
+_dv, _dh = asym.drain_valve()
+feat('Kran_slivnoy_16', '16 Кран сливной', _dv, (0.75,0.6,0.2))
+feat('Kran_slivnoy_16_ruk', '16 Кран сливной: рукоятка', _dh, (0.75,0.16,0.13))
 feat('Shchup', 'Щуп/сапун (условно)', Part.makeCylinder(3, 36, V(xmm(1080), 0, 64), V(0,0,1)).fuse(Part.makeCylinder(8, 5, V(xmm(1080), 0, 100), V(0,0,1))), (0.3,0.3,0.32))
 
 # Лопатки

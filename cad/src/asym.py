@@ -172,4 +172,4 @@ def drain_valve():
     body = hexbar(30, 10, a, d).fuse(Part.makeSphere(17, a + d * 22)).fuse(cyl(9, a + d * 30, d, 16))
     perp = V(0, 1, 0)
     handle = cyl(4, a + d * 34, perp, 70).fuse(box(-2, 2, 0, 0, 0, 0)) if False else cyl(4, a + d * 34, perp, 70)
-    return body.fuse(handle)
+    return body, handle

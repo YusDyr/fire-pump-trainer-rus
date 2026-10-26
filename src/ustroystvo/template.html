@@ -148,6 +148,16 @@ blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:12.
       <button id="foam3" aria-pressed="false" title="Кран эжектора открыт: пеносмеситель подсасывает пенообразователь"><span class="sw" style="background:var(--foam)"></span>Пена</button>
       <button id="home3">Исходный вид</button>
     </div>
+    <div class="chips" role="group" aria-label="Органы управления" id="ctl3">
+      <span class="lbl" style="align-self:center">Управление</span>
+      <button data-ctl="v1l" aria-pressed="true">Вентиль 1 левый</button>
+      <button data-ctl="v1r" aria-pressed="false">Вентиль 1 правый</button>
+      <button data-ctl="v10" aria-pressed="false">Вентиль 10 в цистерну</button>
+      <button data-ctl="k23" aria-pressed="true">Кран 23 ВД</button>
+      <button data-ctl="vac" aria-pressed="false">Кран вакуумный 25</button>
+      <button data-ctl="dr" aria-pressed="false">Кран сливной 16</button>
+      <button data-ctl="doz">Дозатор: 6 %</button>
+    </div>
   </div>
 
   <div class="cols">
@@ -523,6 +533,7 @@ new MutationObserver(themeChange).observe(document.documentElement,{attributes:t
 const HOW3=`<h2>Что показано</h2>
 <p>Модель собрана по рисункам РЭ: ступень НД (рис. 2), ступень ВД с редуктором (рис. 5), обвязка по общему виду (рис. 1) и пеносмеситель (рис. 10). Сверху — коллектор 3 с вентилями 1 и 10, панелью и приборами; от него патрубок 29 идёт к ступени ВД, а на её выходе стоит коллектор 22 с краном 23 и перепускным клапаном 21.</p>
 <p>Секущая плоскость идёт вдоль вала. «По оси НД» разрезает ступень НД, коллектор и пеносмеситель, «по оси ВД» — ступень ВД. «Ступень ВД» включает муфту 5: вал ВД крутится в 2,33 раза быстрее, вода идёт по патрубку 29 и выходит через кран 23. «Пена» открывает кран эжектора: струя из коллектора через сопло подсасывает пенообразователь через дозатор и сбрасывает смесь во всасывание ступени НД.</p>
+<p>Кнопки «Управление» (или щелчок по маховику или рукоятке на модели) открывают и закрывают вентили 1 и 10, кран 23, вакуумный кран 25, сливной кран 16 и переключают дозатор. Вода идёт туда, где открыто. Если все выходы закрыты, вода в ступени НД почти стоит. Если ступень ВД работает, а кран 23 закрыт, открывается перепускной клапан 21 и часть воды уходит в цистерну.</p>
 <div class="key"><span><span class="sw" style="background:var(--water)"></span>вода</span><span><span class="sw" style="background:var(--foam)"></span>пенообразователь</span><span><span class="sw" style="background:var(--cool)"></span>охлаждение вала ВД</span><span><span class="sw" style="background:var(--hp)"></span>муфта включена</span></div>
 <p class="note">Точность: ступени ±2 мм, обвязка ±5–10 мм (по общему виду, без размеров). Лопатки колеса НД, колёса ВД и внутренности вентилей упрощены, направление выхода вентиля 10 условное. Вакуумный агрегат не показан. Вращение замедлено.</p>`;
 let V3=null;
@@ -571,6 +582,20 @@ function init3D(){
     if(/^ВД (4 |18 |16 |Гайка|Зубчатый)/.test(n))return ['hp',1,'clutch'];
     if(/^ВД 23/.test(n))return ['g23',-1,'clutch'];
     return null};
+  // органы управления: деталь → ось поворота (центр и ось в координатах РЭ, мм) и чем она управляется
+  const FCv=(x,y,z)=>new THREE.Vector3(x/1000,z/1000,-y/1000);
+  const CTRL=[
+    {re:/^П 1 Вентиль левый: маховик/,c:FCv(590,-201,290),ax:'x',k:'v1l',turn:4*Math.PI,lift:.012},
+    {re:/^П 1 Вентиль левый: клапан/,c:FCv(0,0,0),k:'v1l',lift:.012},
+    {re:/^П 1 Вентиль правый: маховик/,c:FCv(590,261,290),ax:'x',k:'v1r',turn:4*Math.PI,lift:.012},
+    {re:/^П 1 Вентиль правый: клапан/,c:FCv(0,0,0),k:'v1r',lift:.012},
+    {re:/^П 10 Вентиль в цистерну: маховик/,c:FCv(572,271,465),ax:'x',k:'v10',turn:4*Math.PI,lift:.012},
+    {re:/^П 23 Кран ВД: рукоятка/,c:FCv(272,-198,490),ax:'x',k:'k23',ang:-Math.PI/2},
+    {re:/^П 25 Кран вакуумный: рукоятка/,c:FCv(388,-190,440),ax:'z',k:'vac',ang:Math.PI/2},
+    {re:/^16 Кран сливной: рукоятка/,c:FCv(351,0,-212),ax:'y',k:'dr',ang:Math.PI/2},
+    {re:/^П 5 Рукоятка/,c:FCv(560,4,402),ax:'x',k:'ej',ang:Math.PI/2},
+    {re:/^П 8 Рукоятка/,c:FCv(560,108,402),ax:'x',k:'doz',ang:Math.PI/2},
+    {re:/^ПС 6 Заслонка/,c:FCv(479,108,410),ax:'x',k:'doz',ang:Math.PI/2}];
   const glassRe=/^(20 |12 |ВД 14|ВД 5 |25 Корпус|ВД 30|ВД Кронштейн|П 3 |П 1 Вентиль напорный|П 10 Вентиль напорный|ПС 13|ПС 1 |ПС 2 |ПС 10)/;
   for(const p of MODEL.parts){
     const q=new Uint16Array(bin,p.p,p.nv*3),pos=new Float32Array(p.nv*3);for(let i=0;i<pos.length;i++)pos[i]=lo[i%3]+q[i]*s3[i%3];
@@ -580,11 +605,11 @@ function init3D(){
     const col=new THREE.Color().setRGB(...p.col).convertSRGBToLinear();
     const mat=new THREE.MeshStandardMaterial({color:col,metalness:.05,roughness:.7,clippingPlanes:[plane],side:THREE.FrontSide});
     const cap=new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(.55),clippingPlanes:[plane],side:THREE.BackSide});
-    const r=rotOf(p.name),ax=r?AX[r[0]]:AX.nd;
+    const r=rotOf(p.name),cc=CTRL.find(c=>c.re.test(p.name)),ax=cc?cc.c:r?AX[r[0]]:AX.nd;
     const holder=new THREE.Group(),pivot=new THREE.Group();pivot.position.copy(ax);
     const m=new THREE.Mesh(g,mat),mc=new THREE.Mesh(g,cap);m.position.copy(ax).negate();mc.position.copy(ax).negate();
     pivot.add(m,mc);holder.add(pivot);scene.add(holder);
-    const P={name:p.name,mat,cap,holder,pivot,rot:r,ex:ex(p.name),glass:glassRe.test(p.name),pipe:/^П/.test(p.name),col,i:parts.length};m.userData.P=P;mc.userData.P=P;parts.push(P);pick.push(m,mc);
+    const P={name:p.name,mat,cap,holder,pivot,rot:r,ex:ex(p.name),glass:glassRe.test(p.name),pipe:/^П/.test(p.name),col,i:parts.length,cc,base:ax.clone()};m.userData.P=P;mc.userData.P=P;parts.push(P);pick.push(m,mc);
   }
   // механизм включения муфты по рис. 8: вал вилки с рукояткой, вилка-скоба и ролики (в модели FreeCAD его нет — строим здесь)
   const mech=(()=>{
@@ -613,10 +638,13 @@ function init3D(){
   // потоки по трубам обвязки (мм, координаты РЭ): [точки, радиус разброса, вес, когда показывать, цвет]
   const D45=[0,.72,-.69];
   const SR=[
-    [[[367,78,215],[380,78,262],[400,30,290],[400,-150,290],[430,-201,290],[495,-201,290],[495,-201-72,290-69],[495,-201-110,290-105]],14,1,'nd','w'],
-    [[[367,78,215],[380,78,262],[400,140,290],[400,230,290],[430,261,290],[495,261,290],[495,261+72,290-69],[495,261+110,290-105]],14,1,'nd','w'],
-    [[[400,-60,300],[400,-140,300],[348,-140,300],[173,-140,300],[173,-198,300],[173,-198,222]],10,.8,'hp','w'],
-    [[[272,-198,222],[272,-198,490],[272,-198,575]],6,.6,'hp','w'],
+    [[[367,78,215],[380,78,262],[400,30,290],[400,-150,290],[430,-201,290],[495,-201,290],[495,-201-72,290-69],[495,-201-110,290-105]],14,1,'v1l','w'],
+    [[[367,78,215],[380,78,262],[400,140,290],[400,230,290],[430,261,290],[495,261,290],[495,261+72,290-69],[495,261+110,290-105]],14,1,'v1r','w'],
+    [[[380,78,262],[400,180,300],[400,230,350],[400,230,410],[430,271,465],[380,271,465],[290,271,465]],10,.8,'v10','w'],
+    [[[351,0,-150],[351,0,-200],[351,0,-240],[351,0,-330]],6,.6,'dr','w'],
+    [[[272,-198,300],[272,-198,325],[272,-240,325],[272,-300,325],[272,-380,325]],4,.5,'byp','w'],
+    [[[400,-60,300],[400,-140,300],[348,-140,300],[173,-140,300],[173,-198,300],[173,-198,222]],10,.8,'hpflow','w'],
+    [[[272,-198,222],[272,-198,490],[272,-198,575]],6,.6,'hp23','w'],
     [[[415,0,350],[415,0,478],[479,0,478],[479,0,372],[479,0,300],[479,0,200],[479,0,112],[479,0,40]],5,.7,'foam','w'],
     [[[479,330,410],[479,153,410],[479,108,410],[479,108,335],[479,26,335],[479,0,315],[479,0,200],[479,0,112],[479,0,40]],6,.6,'foam','f']
   ].map(([pts,r,wgt,cond,col])=>{const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1],pts[i][2]-pts[i-1][2]));return {pts,L,len:L[L.length-1],r,cond,col,n:Math.round(wgt*L[L.length-1]/7)}});
@@ -645,6 +673,7 @@ function init3D(){
   function pCool(s,a,b){return polar(XG(150+1290*s),.0045*b,a,Y0,Z0)}
   const cW=new THREE.Color(),cC=new THREE.Color(),cF=new THREE.Color();
   const st={nd:0,hp:0,g23:0,cl:0,ph:new Float32Array(NT),sel:null,hl:null,water:true,foam:false,pipes:true};
+  const CT={v1l:1,v1r:0,v10:0,k23:1,vac:0,dr:0,ej:0,doz:2},CA={v1l:1,v1r:0,v10:0,k23:1,vac:0,dr:0,ej:0,doz:1};
   for(let i=0;i<NT;i++)st.ph[i]=Math.random();
   function setColors(){cW.set(colors.water||'#2e86d1').convertSRGBToLinear();cC.set(colors.cool||'#c04fc4').convertSRGBToLinear();cF.set(tok('--foam')||'#c9a41c').convertSRGBToLinear();
     for(let i=0;i<NT;i++){const k=sOf[i];const c=k>=0?(SR[k].col==='f'?cF:cW):i>=NND+NHP?cC:cW;pc[i*3]=c.r;pc[i*3+1]=c.g;pc[i*3+2]=c.b}pg.attributes.color.needsUpdate=true;
@@ -667,7 +696,9 @@ function init3D(){
   R.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;down=null;
     const r=R.domElement.getBoundingClientRect();v2.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(v2,cam);
     const hits=ray.intersectObjects(pick,false).filter(h=>{const P=h.object.userData.P;let o=P.holder;while(o){if(!o.visible)return false;o=o.parent}return plane.distanceToPoint(h.point)>=-1e-4&&!(glass&&P.glass)});
-    sel3(hits.length?hits[0].object.userData.P.i:null)});
+    const HP_=hits.length?hits[0].object.userData.P:null;
+    if(HP_&&HP_.cc&&HP_.cc.k&&(HP_.cc.ax||/маховик/.test(HP_.name))){toggleCtl(HP_.cc.k)}
+    sel3(HP_?HP_.i:null)});
   V3={R,scene,cam,ctl,parts,home,sel:null,highlight,
     retheme(){setColors();if(st.hl)highlight(st.hl)},
     size(){const w=host.clientWidth,h=host.clientHeight;if(!w)return;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()},
@@ -682,20 +713,28 @@ function init3D(){
       for(const P of parts){if(!P.rot)continue;const [a,dir,cl]=P.rot;P.pivot.rotation.x=a==='nd'?(cl?(P.cAng=(P.cAng||0)+(on?w:0)):st.nd):a==='hp'?st.hp:st.g23}
       for(const P of parts)if(/^П 5 |^ПС (1|14|10) /.test(P.name)&&st.hl!==P){P.mat.emissive.set(tok('--foam')).multiplyScalar(st.foam&&S.rpm>0?.35:0)}
       for(const P of parts)if(/^(5 Муфта|Барабан)/.test(P.name)){P.mat.emissive.set(colors.hp).multiplyScalar(.45*st.cl);if(st.hl===P)P.mat.emissive.set(colors.accent).multiplyScalar(.6)}
+      // органы управления: плавный поворот маховиков и рукояток
+      CT.ej=st.foam?1:0;
+      for(const k in CT){const tgt=k==='doz'?CT.doz/2:CT[k],spd=/^v/.test(k)?.9:2.5;CA[k]+=Math.max(-spd*dt,Math.min(spd*dt,tgt-CA[k]))}
+      for(const P of parts){const c=P.cc;if(!c||!c.k)continue;const a=ease(Math.max(0,Math.min(1,CA[c.k])));
+        P.pivot.position.copy(P.base);if(c.lift)P.pivot.position.x+=c.lift*a;
+        if(c.ax){P.pivot.rotation.set(0,0,0);P.pivot.rotation[c.ax]=(c.turn||c.ang)*a}}
+      const hpOut=on&&CA.k23>.5, byp=on&&CA.k23<=.5, outOpen=CA.v1l>.5||CA.v1r>.5||CA.v10>.5||CA.dr>.5||on;
+      for(const P of parts)if(/^П 21 /.test(P.name)&&st.hl!==P)P.mat.emissive.set(colors.hp).multiplyScalar(byp?.35+.2*Math.sin(S.t*8):0);
       // частицы
-      pts.visible=st.water&&S.rpm>0&&explode<.05;
-      if(pts.visible){const sp=S.play?dt*k*.35:0;
+      pts.visible=st.water&&(S.rpm>0||CA.dr>.5)&&explode<.05;
+      if(pts.visible){const sp=S.play?dt*Math.max(k,CA.dr>.5?.4:0)*.35:0;
         for(let i=0;i<NT;i++){
-          let v;if(i<NND){st.ph[i]=(st.ph[i]+sp)%1;v=pND(st.ph[i],seed[i*3]*6.283,seed[i*3+1],seed[i*3+2])}
+          let v;if(i<NND){st.ph[i]=(st.ph[i]+sp*(outOpen?1:.12))%1;v=pND(st.ph[i],seed[i*3]*6.283,seed[i*3+1],seed[i*3+2])}
           else if(i<NND+NHP){if(on)st.ph[i]=(st.ph[i]+sp*1.6)%1;v=pHP(st.ph[i],seed[i*3]*6.283,seed[i*3+1],seed[i*3+2]);if(!on&&seed[i*3+2]<.18)v.set(0,-9,0)}
           else if(i<NND+NHP+NC){if(on)st.ph[i]=(st.ph[i]+sp*1.2)%1;v=pCool(st.ph[i],seed[i*3]*6.283,seed[i*3+1]);if(!on)v.set(0,-9,0)}
-          else{const Sx=SR[sOf[i]],act=st.pipes&&(Sx.cond==='nd'||(Sx.cond==='hp'&&on)||(Sx.cond==='foam'&&st.foam));
+          else{const Sx=SR[sOf[i]],cnd=Sx.cond,act=st.pipes&&((cnd==='v1l'&&CA.v1l>.5&&S.rpm>0)||(cnd==='v1r'&&CA.v1r>.5&&S.rpm>0)||(cnd==='v10'&&CA.v10>.5&&S.rpm>0)||cnd==='dr'&&CA.dr>.5||(cnd==='hpflow'&&on)||(cnd==='hp23'&&hpOut)||(cnd==='byp'&&byp)||(cnd==='foam'&&st.foam&&S.rpm>0));
             if(act){st.ph[i]=(st.ph[i]+sp*1.5*900/Sx.len)%1;v=pS(Sx,st.ph[i],[seed[i*3]-.5,seed[i*3+1]-.5,seed[i*3+2]-.5])}else v=out.set(0,-9,0)}
           pp[i*3]=v.x;pp[i*3+1]=v.y;pp[i*3+2]=v.z}
         pg.attributes.position.needsUpdate=true}
       ctl.update();R.render(scene,cam)},
     setCut(v){cutC=v;applyCut()},setExplode(v){explode=v;applyExplode()},setGlass(v){glass=v;applyGlass()},setWater(v){st.water=v},
-    setFoam(v){st.foam=v},setPipes(v){st.pipes=v;for(const P of parts)if(P.pipe)P.holder.visible=v}
+    setFoam(v){st.foam=v},setCtl(k,v){CT[k]=v},getCtl(k){return CT[k]},setPipes(v){st.pipes=v;for(const P of parts)if(P.pipe)P.holder.visible=v}
   };
   V3.size();
 }
@@ -720,7 +759,12 @@ function setCutUI(s){$('#cut').value=s;const c=360-s;$('#cutOut').textContent=c>
 $('#cut').addEventListener('input',e=>setCutUI(+e.target.value));
 document.querySelectorAll('[data-cut]').forEach(b=>b.onclick=()=>setCutUI(+b.dataset.cut));
 const tgl=(id,f)=>{$(id).onclick=e=>{const v=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',v);if(V3)f(v)}};
-tgl('#foam3',v=>V3.setFoam(v));tgl('#pipes3',v=>V3.setPipes(v));
+tgl('#foam3',v=>V3.setFoam(v));
+function toggleCtl(k){if(!V3)return;
+  if(k==='ej'){$('#foam3').click();return}
+  if(k==='doz'){const v=(V3.getCtl('doz')+1)%3;V3.setCtl('doz',v);$('[data-ctl=doz]').textContent='Дозатор: '+['закрыт','3 %','6 %'][v];return}
+  const v=V3.getCtl(k)?0:1;V3.setCtl(k,v);const b=$(`[data-ctl=${k}]`);if(b)b.setAttribute('aria-pressed',!!v)}
+document.querySelectorAll('[data-ctl]').forEach(b=>b.onclick=()=>toggleCtl(b.dataset.ctl));tgl('#pipes3',v=>V3.setPipes(v));
 $('#exp').addEventListener('input',e=>{const v=+e.target.value/100;$('#expOut').textContent=v<.01?'собран':Math.round(v*100)+' %';if(V3)V3.setExplode(v)});
 $('#glass').onclick=e=>{const v=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',v);if(V3)V3.setGlass(v)};
 $('#w3').onclick=e=>{const v=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',v);if(V3)V3.setWater(v)};
