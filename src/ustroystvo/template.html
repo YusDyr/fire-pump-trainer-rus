@@ -76,6 +76,10 @@ blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:12.
 .key{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin-top:8px}
 .key span{display:inline-flex;align-items:center;gap:6px}
 .note{font-size:12.5px;color:var(--muted)}
+.warn{background:color-mix(in srgb,var(--hp) 12%,var(--paper));border:1px solid color-mix(in srgb,var(--hp) 45%,var(--line));border-radius:10px;padding:10px 14px;font-size:14px}
+.warn summary{cursor:pointer}
+.warn summary b{font-weight:600}
+.warn p{margin:8px 0;max-width:72ch}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:reduce){.tip{transition:none}}
 </style>
@@ -85,6 +89,14 @@ blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:12.
     <h1>Устройство насоса НЦПК-40/100-4/400</h1>
     <a class="back" id="back" href="index.html" hidden>← к эмулятору</a>
   </header>
+
+  <details class="warn">
+    <summary><b>Это исполнение В1Т по его РЭ, а у нас НЦПК-40/100-4/400М-В1У.</b> Привод ступени ВД, смазка и дозатор у нас другие — подробнее</summary>
+    <p>Разрезы и 3D-модель сделаны по РЭ насоса НЦПК-40/100-4/400В1Т: муфта 5 с рукояткой, зубчатый редуктор, масляная ванна. Проточная часть ступени НД (колесо, улитка, крышка, сальник), по-видимому, общая, но для нашего исполнения это не проверено.</p>
+    <blockquote>«М – модификация насоса НЦПК-40/100-4/400, отличающаяся наличием ременного привода и электромагнитной муфты для включения ступени высокого давления, наличием "сухих" подшипников работающих без масляного картера, дозатора выполненного на базе шарового крана, наличием вакуумного агрегата установленного непосредственно на насос и наличием дополнительного выхода в напорном коллекторе»<cite>Паспорт насоса НЦПК-40/100-4/400М-В1У, разд. 1</cite></blockquote>
+    <blockquote>«В состав насоса НЦПК-40/100-4/400М-В1У входит насос центробежный высокого давления КШИН.062233.007»<cite>Паспорт, разд. 5</cite></blockquote>
+    <p>У нас: ступень ВД включается кнопкой на БУК (электромагнитная муфта, поликлиновой ремень), масляного картера и щупа нет, вакуумный агрегат стоит на насосе.</p>
+  </details>
 
   <div class="tabs" role="tablist" aria-label="Вид">
     <button role="tab" data-tab="nd" aria-selected="true">Ступень НД · рис. 2</button>
