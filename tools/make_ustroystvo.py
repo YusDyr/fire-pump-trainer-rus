@@ -5,7 +5,7 @@
 
 Исходники лежат в src/ustroystvo/:
   template.html          — разметка и код страницы;
-  nd_*.webp, hp_*.webp   — чертёж (ink: прозрачность линий) и маска областей
+  nd_*.webp, hp_*.webp   — чертёж (ink: прозрачность линий), карта деталей (parts: R = номер позиции) и маска областей
                            (R — вода, G — масло, B: 255 — вал, 120 — охлаждающая вода) для рис. 2 и рис. 5;
   nd_data.json, hp_data.json — пути частиц воды, координаты деталей на чертеже;
   model.json + model.bin — 3D-модель (cad/model/NCPK_nasos.glb, сжата: координаты uint16, нормали int8);
@@ -28,6 +28,7 @@ def assemble():
     rep = {
         '__ND_INK__': b64('nd_ink.webp'), '__ND_MASK__': b64('nd_mask.webp'),
         '__HP_INK__': b64('hp_ink.webp'), '__HP_MASK__': b64('hp_mask.webp'),
+        '__ND_PARTS__': b64('nd_parts.webp'), '__HP_PARTS__': b64('hp_parts.webp'),
         '__ND_DATA__': open(U('nd_data.json'), encoding='utf-8').read(),
         '__HP_DATA__': open(U('hp_data.json'), encoding='utf-8').read(),
         '__MODEL_JSON__': open(U('model.json'), encoding='utf-8').read(),

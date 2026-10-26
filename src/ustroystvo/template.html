@@ -165,8 +165,8 @@ blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:12.
 <script>__THREE__</script>
 <script>
 const FIG={
- nd:{IW:2272,IH:1809,ink:"data:image/webp;base64,__ND_INK__",mask:"data:image/webp;base64,__ND_MASK__",D:__ND_DATA__},
- hp:{IW:1640,IH:1450,ink:"data:image/webp;base64,__HP_INK__",mask:"data:image/webp;base64,__HP_MASK__",D:__HP_DATA__}
+ nd:{IW:2272,IH:1809,ink:"data:image/webp;base64,__ND_INK__",mask:"data:image/webp;base64,__ND_MASK__",parts:"data:image/webp;base64,__ND_PARTS__",D:__ND_DATA__},
+ hp:{IW:1640,IH:1450,ink:"data:image/webp;base64,__HP_INK__",mask:"data:image/webp;base64,__HP_MASK__",parts:"data:image/webp;base64,__HP_PARTS__",D:__HP_DATA__}
 };
 const MODEL=__MODEL_JSON__;
 const MODEL_BIN="__MODEL_BIN__";
@@ -305,13 +305,16 @@ function layerFrom(f,alpha,color,op){
   x.putImageData(id,0,0);return c}
 async function prep(f){
   if(f.raw)return;
-  const [ink,mask]=await Promise.all([load(f.ink),load(f.mask)]);
+  const [ink,mask,pim]=await Promise.all([load(f.ink),load(f.mask),load(f.parts)]);
   const n=f.IW*f.IH,c=document.createElement('canvas');c.width=f.IW;c.height=f.IH;const x=c.getContext('2d',{willReadFrequently:true});
   x.drawImage(ink,0,0);let d=x.getImageData(0,0,f.IW,f.IH).data;const R={ink:new Uint8Array(n),water:new Uint8Array(n),oil:new Uint8Array(n),shaft:new Uint8Array(n),cool:new Uint8Array(n)};
   for(let i=0;i<n;i++)R.ink[i]=d[i*4];
   x.clearRect(0,0,f.IW,f.IH);x.drawImage(mask,0,0);d=x.getImageData(0,0,f.IW,f.IH).data;
   for(let i=0,j=0;i<n;i++,j+=4){R.water[i]=d[j];R.oil[i]=d[j+1];const b=d[j+2];if(b>190)R.shaft[i]=255;else if(b>60)R.cool[i]=255}
-  f.raw=R;f.C=null;
+  // карта деталей: номер позиции в каждом пикселе (области сняты с сечения 3D-модели и подогнаны к линиям чертежа)
+  x.clearRect(0,0,f.IW,f.IH);x.drawImage(pim,0,0);d=x.getImageData(0,0,f.IW,f.IH).data;R.pid=new Uint8Array(n);
+  for(let i=0;i<n;i++)R.pid[i]=d[i*4];
+  f.raw=R;f.C=null;f.hl={};
   const D=f.D;f.PATHS=D.paths.map(p=>mkPath(p.pts));if(D.cool)f.COOL=mkPath(D.cool);
 }
 function buildLayers(){
@@ -392,6 +395,8 @@ function draw(dt){
     if(S.layers.water&&hpOn())particles(F.PATHS,flowHP,colors.waterD,15,5);
     if(S.layers.cool&&hpOn())particles([F.COOL],coolF,colors.cool,12,4);
   }
+  // подсветка выбранной и наведённой детали — вся область детали
+  for(const [n,a] of [[S.hover,.2],[F.sel,.42]]){const L=n!=null&&regionLayer(n);if(L){ctx.globalAlpha=a+(n===F.sel?.08*Math.sin(S.t*4):0);ctx.drawImage(L,0,0,W,H);ctx.globalAlpha=1}}
   ctx.drawImage(inkS,0,0);
   if(nd){
     if(S.layers.water&&S.rpm>0)arrow([D.outlet[0][0],D.outlet[0][1]],[D.outlet[1][0],D.outlet[1][1]+20],colors.water,'к напорному коллектору');
@@ -410,8 +415,8 @@ function draw(dt){
     label(hpOn()?`вал ВД: ${fmtN(r)} об/мин (×2,33)`:(S.rpm>0?'ступень ВД не включена: вал стоит, вода под давлением ступени НД':'насос не работает'),X(40),X(70),'left',hpOn()?colors.hp:colors.muted,true);
   }
   for(const [n,col,pulse] of [[S.hover,colors.muted,false],[F.sel,colors.accent,true]]){
-    if(n==null||!D.parts[n])continue;const [x,y]=D.parts[n][1];const r=X(30)+(pulse?X(6)*Math.sin(S.t*4):0);
-    ctx.strokeStyle=col;ctx.lineWidth=Math.max(2,X(6));ctx.beginPath();ctx.arc(X(x),X(y),r,0,7);ctx.stroke();
+    if(n==null||!D.parts[n])continue;const [x,y]=D.parts[n][1];const reg=(D.regions||[]).includes(+n);const r=X(30)+(pulse?X(6)*Math.sin(S.t*4):0);
+    if(!reg){ctx.strokeStyle=col;ctx.lineWidth=Math.max(2,X(6));ctx.beginPath();ctx.arc(X(x),X(y),r,0,7);ctx.stroke()}
     if(pulse)label(n+' · '+D.parts[n][0],X(x),X(y)-r-X(14),'center',col,true);
   }
 }
@@ -449,12 +454,21 @@ function select(n){F.sel=+n;document.querySelectorAll('[data-part]').forEach(b=>
   if(!inf)h+=`<p class="note">Позиция ${n} по легенде ${S.tab==='nd'?'рис. 2':'рис. 5'} РЭ насоса.</p>`;$('#det').innerHTML=h}
 
 function toImg(e){const r=cv.getBoundingClientRect();return [(e.clientX-r.left)/r.width*F.IW,(e.clientY-r.top)/r.height*F.IH]}
+function regionLayer(n){
+  const f=F;if(!f||!f.raw||!(f.D.regions||[]).includes(+n))return null;const key=n+colors.accent;if(f.hl[key])return f.hl[key];
+  const p=f.raw.pid,a=new Uint8Array(p.length);for(let i=0;i<p.length;i++)if(p[i]===+n)a[i]=255;
+  return f.hl[key]=layerFrom(f,a,colors.accent,1)}
+function pickAt(x,y){
+  const f=F;x=Math.round(x);y=Math.round(y);if(!f.raw||x<0||y<0||x>=f.IW||y>=f.IH)return nearest(x,y);
+  // точно по области детали; рядом с линией — соседние пиксели; иначе — ближайшая позиция на чертеже
+  const p=f.raw.pid;for(const r of [0,3,7]){for(const [dx,dy] of [[0,0],[r,0],[-r,0],[0,r],[0,-r]]){const xx=x+dx,yy=y+dy;if(xx<0||yy<0||xx>=f.IW||yy>=f.IH)continue;const k=p[yy*f.IW+xx];if(k&&f.D.parts[k])return k}}
+  return nearest(x,y)}
 function nearest(x,y){let best=null,bd=55;for(const n in F.D.parts){const [px,py]=F.D.parts[n][1];const d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best=+n}}return best}
 const tip=$('#tip');
-cv.addEventListener('pointermove',e=>{if(!F)return;const [x,y]=toImg(e);const n=nearest(x,y);S.hover=n;cv.style.cursor=n?'pointer':'default';
+cv.addEventListener('pointermove',e=>{if(!F)return;const [x,y]=toImg(e);const n=pickAt(x,y);S.hover=n;cv.style.cursor=n?'pointer':'default';
   if(n&&e.pointerType==='mouse'){const sr=$('#st2').getBoundingClientRect();tip.textContent=n+' · '+F.D.parts[n][0];tip.style.left=(e.clientX-sr.left)+'px';tip.style.top=(e.clientY-sr.top)+'px';tip.classList.add('on')}else tip.classList.remove('on')});
 cv.addEventListener('pointerleave',()=>{S.hover=null;tip.classList.remove('on')});
-cv.addEventListener('click',e=>{if(!F)return;const [x,y]=toImg(e);const n=nearest(x,y);if(n)select(n)});
+cv.addEventListener('click',e=>{if(!F)return;const [x,y]=toImg(e);const n=pickAt(x,y);if(n)select(n)});
 
 function layerChips(){
   const box=$('#layers2');box.innerHTML='';
@@ -474,7 +488,7 @@ async function setTab(t){
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{resize();size3()},120)});
-const themeChange=()=>{readColors();if(F&&F.raw)buildLayers();if(V3)V3.retheme()};
+const themeChange=()=>{readColors();if(F&&F.raw){F.hl={};buildLayers()}if(V3)V3.retheme()};
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',themeChange);
 new MutationObserver(themeChange).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 
@@ -543,7 +557,7 @@ function init3D(){
     const holder=new THREE.Group(),pivot=new THREE.Group();pivot.position.copy(ax);
     const m=new THREE.Mesh(g,mat),mc=new THREE.Mesh(g,cap);m.position.copy(ax).negate();mc.position.copy(ax).negate();
     pivot.add(m,mc);holder.add(pivot);scene.add(holder);
-    const P={name:p.name,mat,cap,holder,pivot,rot:r,ex:ex(p.name),glass:glassRe.test(p.name),pipe:/^П/.test(p.name),col,i:parts.length};m.userData.P=P;parts.push(P);pick.push(m);
+    const P={name:p.name,mat,cap,holder,pivot,rot:r,ex:ex(p.name),glass:glassRe.test(p.name),pipe:/^П/.test(p.name),col,i:parts.length};m.userData.P=P;mc.userData.P=P;parts.push(P);pick.push(m,mc);
   }
   // вода: частицы
   const XG=px=>(318+(px-1515)/3.9)/1000, ND=v=>v/1000;
@@ -598,14 +612,15 @@ function init3D(){
   function applyCut(){plane.constant=cutC>=355?10:(cutC+1.5)/1000}
   function applyExplode(){for(const P of parts)P.holder.position.set(P.ex[0]*explode*.75,P.ex[1]*explode*.75,P.ex[2]*explode*.75)}
   function applyGlass(){for(const P of parts){if(!P.glass)continue;P.mat.transparent=glass;P.mat.opacity=glass?.22:1;P.mat.depthWrite=!glass;P.cap.visible=!glass;P.mat.needsUpdate=true}}
-  function highlight(P){if(st.hl)st.hl.mat.emissive.setHex(0);st.hl=P;if(P)P.mat.emissive.set(colors.accent).multiplyScalar(.35)}
+  function highlight(P){if(st.hl){st.hl.mat.emissive.setHex(0);st.hl.cap.color.copy(st.hl.col).multiplyScalar(.55)}st.hl=P;
+    if(P){P.mat.emissive.set(colors.accent).multiplyScalar(.6);P.cap.color.set(colors.accent).convertSRGBToLinear()}}
   applyCut();
   // выбор детали касанием
   const ray=new THREE.Raycaster(),v2=new THREE.Vector2();let down=null;
   R.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY]});
   R.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;down=null;
     const r=R.domElement.getBoundingClientRect();v2.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(v2,cam);
-    const hits=ray.intersectObjects(pick,false).filter(h=>plane.distanceToPoint(h.point)>=-1e-4&&!(glass&&h.object.userData.P.glass));
+    const hits=ray.intersectObjects(pick,false).filter(h=>{const P=h.object.userData.P;let o=P.holder;while(o){if(!o.visible)return false;o=o.parent}return plane.distanceToPoint(h.point)>=-1e-4&&!(glass&&P.glass)});
     sel3(hits.length?hits[0].object.userData.P.i:null)});
   V3={R,scene,cam,ctl,parts,home,sel:null,highlight,
     retheme(){setColors();if(st.hl)highlight(st.hl)},
@@ -616,7 +631,7 @@ function init3D(){
       st.cl+=((on?1:0)-st.cl)*Math.min(1,dt*6);
       for(const P of parts){if(!P.rot)continue;const [a,dir,cl]=P.rot;P.pivot.rotation.x=a==='nd'?(cl?(P.cAng=(P.cAng||0)+(on?w:0)):st.nd):a==='hp'?st.hp:st.g23}
       for(const P of parts)if(/^П 5 |^ПС (1|14|10) /.test(P.name)&&st.hl!==P){P.mat.emissive.set(tok('--foam')).multiplyScalar(st.foam&&S.rpm>0?.35:0)}
-      for(const P of parts)if(/^(5 Муфта|Барабан)/.test(P.name)){P.mat.emissive.set(colors.hp).multiplyScalar(.45*st.cl);if(st.hl===P)P.mat.emissive.set(colors.accent).multiplyScalar(.35)}
+      for(const P of parts)if(/^(5 Муфта|Барабан)/.test(P.name)){P.mat.emissive.set(colors.hp).multiplyScalar(.45*st.cl);if(st.hl===P)P.mat.emissive.set(colors.accent).multiplyScalar(.6)}
       // частицы
       pts.visible=st.water&&S.rpm>0&&explode<.05;
       if(pts.visible){const sp=S.play?dt*k*.35:0;
