@@ -1,51 +1,50 @@
 #!/usr/bin/env python3
-"""Сборка страницы «Устройство насоса» (разрезы рис. 2 и 5 + 3D-модель) в один HTML-файл.
+"""Сборка страницы «Устройство насоса» (разрезы ступеней + 3D-модель) в один HTML-файл.
 
-    python3 tools/make_ustroystvo.py [выходной.html]
+    python3 tools/make_ustroystvo.py [каталог] [выходной.html]
 
-Исходники лежат в src/ustroystvo/:
+Каталоги исходников:
+  src/ustroystvo/      — насос НЦПК-40/100-4/400М-В1У по РЭ 2025 г. (рис. 3, 4, 5 и 3D) → emulator/ustroystvo.html;
+  src/ustroystvo_v1t/  — исполнение В1Т по РЭ КШИН.062223.015 (рис. 2, 5, 8 и 3D) → emulator/ustroystvo-v1t.html.
+
+В каждом каталоге:
   template.html          — разметка и код страницы;
-  nd_*.webp, hp_*.webp   — чертёж (ink: прозрачность линий), карта деталей (parts: R = номер позиции) и маска областей
-                           (R — вода, G — масло, B: 255 — вал, 120 — охлаждающая вода) для рис. 2 и рис. 5;
-  nd_data.json, hp_data.json — пути частиц воды, координаты деталей на чертеже;
-  model.json + model.bin — 3D-модель (cad/model/NCPK_nasos.glb, сжата: координаты uint16, нормали int8);
+  *_ink.webp, *_parts.webp, *_mask.webp — чертёж (прозрачность линий), карта деталей (R = номер позиции)
+                           и маска областей (R — вода, G — масло, B: 255 — вал, 120 — охлаждающая вода);
+  *_data.json            — пути частиц воды, координаты деталей на чертеже;
+  model.json + model.bin — 3D-модель (координаты uint16, нормали int8, см. tools/glb_to_model.py);
   vendor/                — three.js r147 (MIT) и OrbitControls.
-Страница работает без сети (кроме шрифтов Google, которые build.py заменяет на локальные).
+Метки в шаблоне вида __ND_INK__ заменяются содержимым файла nd_ink.webp (base64), __ND_DATA__ — nd_data.json (текст),
+__MODEL_JSON__ — model.json, __MODEL_BIN__ — model.bin (base64). Страница работает без сети (кроме шрифтов Google,
+которые build.py заменяет на локальные).
 """
-import base64, os, sys
+import base64, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-U = lambda *a: os.path.join(ROOT, 'src', 'ustroystvo', *a)
 
 
-def b64(name):
-    return base64.b64encode(open(U(name), 'rb').read()).decode()
-
-
-def assemble():
+def assemble(name='ustroystvo'):
+    U = lambda *a: os.path.join(ROOT, 'src', name, *a)
     t = open(U('template.html'), encoding='utf-8').read()
     three = open(U('vendor', 'three.min.js'), encoding='utf-8').read() + '\n' + open(U('vendor', 'OrbitControls.min.js'), encoding='utf-8').read()
-    rep = {
-        '__ND_INK__': b64('nd_ink.webp'), '__ND_MASK__': b64('nd_mask.webp'),
-        '__HP_INK__': b64('hp_ink.webp'), '__HP_MASK__': b64('hp_mask.webp'),
-        '__ND_PARTS__': b64('nd_parts.webp'), '__HP_PARTS__': b64('hp_parts.webp'),
-        '__ND_DATA__': open(U('nd_data.json'), encoding='utf-8').read(),
-        '__HP_DATA__': open(U('hp_data.json'), encoding='utf-8').read(),
-        '__MODEL_JSON__': open(U('model.json'), encoding='utf-8').read(),
-        '__MODEL_BIN__': b64('model.bin'),
-    }
-    for k, v in rep.items():
-        if k not in t:
-            sys.exit(f'В шаблоне нет {k}')
-        t = t.replace(k, v)
+
+    def sub(m):
+        a, b = m.group(1).lower(), m.group(2).lower()
+        for fn, kind in ((f'{a}_{b}.webp', 'b64'), (f'{a}_{b}.png', 'b64'), (f'{a}_{b}.json', 'txt'), (f'{a}.{b}', 'b64' if b == 'bin' else 'txt')):
+            if os.path.exists(U(fn)):
+                d = open(U(fn), 'rb').read()
+                return base64.b64encode(d).decode() if kind == 'b64' else d.decode('utf-8')
+        sys.exit(f'{name}: нет файла для метки {m.group(0)}')
+    t = re.sub(r'__([A-Z0-9]+)_([A-Z0-9]+)__', sub, t.replace('<script>__THREE__</script>', '<script>@@THREE@@</script>'))
     # three.js вставляем последним: в нём могут встретиться любые строки
-    t = t.replace('<script>__THREE__</script>', '<script>' + three.replace('</script', '<\\/script') + '</script>', 1)
+    t = t.replace('<script>@@THREE@@</script>', '<script>' + three.replace('</script', '<\\/script') + '</script>', 1)
     return t
 
 
 if __name__ == '__main__':
-    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'build', 'ustroystvo.html')
+    name = sys.argv[1] if len(sys.argv) > 1 else 'ustroystvo'
+    out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, 'build', name.replace('_', '-') + '.html')
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    h = assemble()
+    h = assemble(name)
     open(out, 'w', encoding='utf-8').write(h)
     print(f'{out}: {len(h) // 1024} КБ')

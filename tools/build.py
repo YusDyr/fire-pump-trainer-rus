@@ -7,7 +7,7 @@
 Что делает:
   * подменяет шрифты Google Fonts на локальные (android/fonts.css + android/fonts/*.woff2);
   * добавляет в заголовок ссылку «vX.Y» на CHANGELOG;
-  * пишет emulator/index.html, emulator/ustroystvo.html (устройство насоса, 3D) и emulator/fonts/ (сайт на GitHub Pages);
+  * пишет emulator/index.html, emulator/ustroystvo.html (устройство насоса, 3D), emulator/ustroystvo-v1t.html (то же для исполнения В1Т) и emulator/fonts/ (сайт на GitHub Pages);
   * собирает android/assets/ (index.html, fonts, photos) для APK;
   * проставляет versionCode/versionName в android/AndroidManifest.xml.
 """
@@ -41,6 +41,7 @@ def localize(html):
 
 html = localize(open(P('src', 'emulator.html'), encoding='utf-8').read())
 ust = localize(make_ustroystvo.assemble())
+ust1 = localize(make_ustroystvo.assemble('ustroystvo_v1t'))
 mark = 'Учебный эмулятор насосной установки · ГАЗон NEXT C41R33</p>'
 if mark not in html:
     sys.exit('Не найдена строка подзаголовка для ссылки на версию')
@@ -54,6 +55,7 @@ def put_fonts(dst):
 os.makedirs(P('emulator'), exist_ok=True)
 open(P('emulator', 'index.html'), 'w', encoding='utf-8').write(html)
 open(P('emulator', 'ustroystvo.html'), 'w', encoding='utf-8').write(ust)
+open(P('emulator', 'ustroystvo-v1t.html'), 'w', encoding='utf-8').write(ust1)
 put_fonts(P('emulator', 'fonts'))
 
 # ассеты APK
@@ -62,6 +64,7 @@ shutil.rmtree(A, ignore_errors=True)
 os.makedirs(A)
 open(os.path.join(A, 'index.html'), 'w', encoding='utf-8').write(html)
 open(os.path.join(A, 'ustroystvo.html'), 'w', encoding='utf-8').write(ust)
+open(os.path.join(A, 'ustroystvo-v1t.html'), 'w', encoding='utf-8').write(ust1)
 put_fonts(os.path.join(A, 'fonts'))
 shutil.copytree(P('emulator', 'photos'), os.path.join(A, 'photos'))
 

@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""cad/model/NCPK_nasos.glb -> src/ustroystvo/model.json + model.bin (для 3D на странице «Устройство насоса»).
+"""GLB -> model.json + model.bin (для 3D на странице «Устройство насоса»).
+    python3 tools/glb_to_model.py [модель.glb] [каталог страницы]   (по умолчанию cad/model/NCPK_M_V1U.glb -> src/ustroystvo)
 Примитивы каждой детали сливаются в один, координаты квантуются в uint16 по общему габариту, нормали — в int8."""
 import json, struct, os, numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-f=open(os.path.join(ROOT,'cad','model','NCPK_nasos.glb'),'rb').read()
+import sys
+GLB=sys.argv[1] if len(sys.argv)>1 else os.path.join(ROOT,'cad','model','NCPK_M_V1U.glb')
+DST=sys.argv[2] if len(sys.argv)>2 else os.path.join(ROOT,'src','ustroystvo')
+f=open(GLB,'rb').read()
 L=struct.unpack('<I',f[12:16])[0]; j=json.loads(f[20:20+L])
 bin0=20+L; BL=struct.unpack('<I',f[bin0:bin0+4])[0]; B=f[bin0+8:bin0+8+BL]
 CT={5126:np.float32,5125:np.uint32,5123:np.uint16,5121:np.uint8}
@@ -38,6 +42,6 @@ for p in parts:
     meta.append(dict(name=p['name'],col=[round(c,3) for c in p['col'][:3]],nv=len(q),ni=len(idx),i32=idx.dtype==np.uint32,
         p=put(q),n=put(qn),i=put(idx)))
 out=dict(lo=lo.tolist(),sc=sc.tolist(),parts=meta)
-open(os.path.join(ROOT,'src','ustroystvo','model.json'),'w',encoding='utf-8').write(json.dumps(out,ensure_ascii=False))
-open(os.path.join(ROOT,'src','ustroystvo','model.bin'),'wb').write(bytes(blob))
+open(os.path.join(DST,'model.json'),'w',encoding='utf-8').write(json.dumps(out,ensure_ascii=False))
+open(os.path.join(DST,'model.bin'),'wb').write(bytes(blob))
 print(len(blob),sum(m['nv'] for m in meta),sum(m['ni'] for m in meta)//3, lo,hi)
