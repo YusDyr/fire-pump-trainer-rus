@@ -10,3 +10,6 @@ tools/tests/test.html
 node_modules/
 __pycache__/
 tools/tests/*.png
+# промежуточные файлы сборки 3D-модели
+cad/src_m/out/
+__pycache__/
