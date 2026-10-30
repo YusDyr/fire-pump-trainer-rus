@@ -13,3 +13,5 @@ tools/tests/*.png
 # промежуточные файлы сборки 3D-модели
 cad/src_m/out/
 __pycache__/
+tools/blender/win/*.glb
+tools/blender/win/water_scene.py

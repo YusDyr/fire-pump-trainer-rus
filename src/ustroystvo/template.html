@@ -175,6 +175,18 @@ blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:12.
   </div>
 
   <div class="card how" id="how"></div>
+
+  <div class="card" id="vids">
+    <h2>Потоки воды — видео</h2>
+    <div class="chips" role="group" aria-label="Сценарий">
+      <button data-vid="NCPK_vodoyom" aria-pressed="true">Забор из водоёма</button>
+      <button data-vid="NCPK_cisterna_gidrant" aria-pressed="false">Цистерна и гидрант</button>
+      <button data-vid="NCPK_sliv_produvka" aria-pressed="false">Слив и продувка</button>
+      <button data-vid="NCPK_VD_pena" aria-pressed="false">Ступень ВД и пена</button>
+    </div>
+    <video id="vidEl" controls playsinline preload="metadata" style="width:100%;margin-top:10px;border-radius:8px;background:#222;aspect-ratio:16/9"></video>
+    <p class="note">Разрез насоса, вода показана схематично: частицы идут по линиям потоков, заполненные участки подсвечены. Последовательность действий — по РЭ насоса М-В1У (2025) и урокам эмулятора. Вращение замедлено.</p>
+  </div>
 </div>
 
 <script>__THREE__</script>
@@ -228,7 +240,7 @@ const META={
  15:{p:"Колесо закреплено на конце вала консольно гайкой со шплинтом. Вода приходит в его центр вдоль оси и выходит по каналам между дисками в улитку корпуса.",q:[QND,QJAM]},
  16:{p:"Крышка с осевым подводом: к её фланцу на шпильках крепится всасывающий трубопровод АЦ. Между крышкой и корпусом — кольцо 14.",q:[QIN]},
  17:{p:"Защитная сетка на входе в крышку задерживает мусор перед колесом. Засор сетки — частая причина кавитации.",q:[QSIEVE,QCAV]},
- 13:{p:"Корпус насоса: улитка с напорным патрубком вверх и корпус опор вала с подшипниками 6 и 9. На корпусе стоит датчик тахометра 7, к нему крепится электромагнитная муфта 5.",q:[QND]},
+ 13:{p:"Корпус насоса: улитка с касательным напорным патрубком вверх (справа, если смотреть со входа) и корпус опор вала с подшипниками 6 и 9. На корпусе стоит датчик тахометра 7, к нему крепится электромагнитная муфта 5.",q:[QND]},
  14:{p:"Уплотнительное кольцо 275-285-58 между корпусом 13 и крышкой 16.",q:[Q("Кольца уплотнительные по ГОСТ 18829: … 14 275-285-58.","РЭ насоса, рис. 3")]},
  12:{p:"Уплотнительное кольцо 108-115-46 во фланце напорного патрубка.",q:[Q("Кольца уплотнительные по ГОСТ 18829: … 12 – 108-115-46","РЭ насоса, рис. 3")]},
  22:{p:"Вал ступени НД. Слева — полумуфта 1 для карданного вала, справа — рабочее колесо 15. Максимум — 3000 об/мин.",q:[QROT,QHAND]},
@@ -628,14 +640,18 @@ function init3D(){
     return null};
   // органы управления: деталь → ось поворота (центр в координатах модели, мм) и чем она управляется
   const f1=(px,py)=>[(px-540)*.9,(690-py)*.9];
-  const [yL,zL]=f1(330,350),[yR,zR]=f1(960,350),[yT,zT]=f1(720,365),[yv,zv]=f1(400,60),[ye,ze]=f1(540,255),xout=hx(1255);
+  const [yL,zL]=[-290,258],[yR,zR]=[380,250],[yT,zT]=[145,325],[yv,zv]=[-147,560],[ye,ze]=[-30,293],xout=hx(1255),XH=372,YH=-224,ZK=468,YN=95;   // по фото отсека; YN — напорный патрубок улитки (касательный выход справа, рис. 1 РЭ)
   const CTRL=[
-    {re:/^П 1 Напорный вентиль DN70 \(левый\): маховик/,c:FCv(512,yL,zL),ax:'x',k:'v1l',turn:4*Math.PI,lift:.012},
-    {re:/^П 12 Напорный вентиль DN70 \(правый\): маховик/,c:FCv(512,yR,zR),ax:'x',k:'v1r',turn:4*Math.PI,lift:.012},
+    {re:/^П 1 Напорный вентиль DN70 \(левый\): маховик/,c:FCv(447+65*.866,yL-65*.5,zL),axv:[.866,0,.5],k:'v1l',turn:4*Math.PI,lift:.012},   // крышка развёрнута наружу на 30°
+    {re:/^П 12 Напорный вентиль DN70 \(правый\): маховик/,c:FCv(447+65*.866,yR+65*.5,zR),axv:[.866,0,-.5],k:'v1r',turn:4*Math.PI,lift:.012},
     {re:/^П 10 Напорный вентиль DN80 заполнения цистерны: маховик/,c:FCv(507,yT,zT),ax:'x',k:'vt',turn:4*Math.PI,lift:.012},
-    {re:/^П 31 Кран высокого давления: рукоятка/,c:FCv(xout,HPY-106,HPZ+226),ax:'z',k:'kvd',ang:-Math.PI/2},
-    {re:/^П 5 Рукоятка вакуумного затвора/,c:FCv(483,yv-5,zv),ax:'z',k:'vac',ang:Math.PI/2},
-    {re:/^П Кран эжектора: рукоятка/,c:FCv(590,ye,ze),ax:'x',k:'ej',ang:Math.PI/2}];
+    {re:/^П 1 Напорный вентиль DN70 \(левый\): (тарель|шпиндель)/,c:FCv(456,yL,zL),axv:[.866,0,.5],k:'v1l',ang:0,lift:.02},
+    {re:/^П 12 Напорный вентиль DN70 \(правый\): (тарель|шпиндель)/,c:FCv(456,yR,zR),axv:[.866,0,-.5],k:'v1r',ang:0,lift:.02},
+    {re:/^П 10 Напорный вентиль DN80 заполнения цистерны: (тарель|шпиндель)/,c:FCv(456,yT,zT),ax:'x',k:'vt',ang:0,lift:.02},
+    {re:/^П 31 Кран высокого давления: шар/,c:FCv(XH,YH,ZK),ax:'z',k:'kvd',ang:Math.PI/2,inv:1},
+    {re:/^П 31 Кран высокого давления: рукоятка/,c:FCv(XH,YH-46,ZK),ax:'z',k:'kvd',ang:Math.PI/2,inv:1},   // вертикально — открыт
+    {re:/^П 5 Рукоятка вакуумного затвора/,c:FCv(483,yv,zv+20),ax:'x',k:'vac',ang:-Math.PI/2,inv:1},
+    {re:/^П Кран эжектора: рукоятка/,c:FCv(560,ye,ze+27),ax:'y',k:'ej',ang:Math.PI/2,inv:1}];
   const glassRe=/^(НД 13 |НД 16 |ВД 1 |ВД 6 |П Коллектор|Р Кожух)/;
   for(const p of MODEL.parts){
     const q=new Uint16Array(bin,p.p,p.nv*3),pos=new Float32Array(p.nv*3);for(let i=0;i<pos.length;i++)pos[i]=lo[i%3]+q[i]*s3[i%3];
@@ -659,13 +675,13 @@ function init3D(){
   const [yd,zd]=f1(420,370),[yp,zp]=f1(500,480),[yr,zr]=f1(470,985),xin=hx(1005);
   // потоки по трубам обвязки (мм): [точки, радиус разброса, вес, когда показывать, цвет]
   const SR=[
-    [[[447,0,250],[447,-60,295],[447,-150,302],[447,yL,zL],[447,yL-60,zL-60],[447,yL-95,zL-95]],13,1,'v1l','w'],
-    [[[447,0,250],[447,120,295],[447,300,302],[447,yR,zR],[447,yR+60,zR-60],[447,yR+95,zR-95]],13,1,'v1r','w'],
-    [[[447,0,250],[447,100,290],[447,yT,zT],[400,yT,zT],[320,yT,zT],[250,yT,zT]],10,.8,'vt','w'],
+    [[[447,YN,250],[447,-60,295],[447,-150,302],[447,yL,zL],[447,yL-60,zL-60],[447,yL-95,zL-95]],13,1,'v1l','w'],
+    [[[447,YN,250],[447,120,295],[447,300,302],[447,yR,zR],[447,yR+60,zR-60],[447,yR+95,zR-95]],13,1,'v1r','w'],
+    [[[447,YN,250],[447,100,290],[447,yT,zT],[400,yT,zT],[320,yT,zT],[250,yT,zT]],10,.8,'vt','w'],
     [[[373,0,-170],[420,yr,-230],[440,yr,zr],[440,yr,zr-80]],6,.6,'dr','w'],
     [[[447,-60,290],[420,-150,300],[xin,-150,300],[xin,HPY,300],[xin,HPY,HPZ+150]],10,.8,'hpflow','w'],
-    [[[xout,HPY,HPZ+150],[xout,HPY,HPZ+210],[xout,HPY-90,HPZ+210],[xout,HPY-190,HPZ+210]],6,.6,'hpout','w'],
-    [[[xout,HPY,HPZ+210],[xout,HPY+40,HPZ+210],[xout,HPY+60,HPZ+190]],4,.4,'byp','w'],
+    [[[xout,HPY,HPZ+150],[xout,HPY,HPZ+210],[XH,YH,HPZ+210],[XH,YH,680],[XH-40,YH,760]],6,.6,'hpout','w'],
+    [[[XH,YH,300],[XH,-300,250],[XH,-430,150]],4,.4,'byp','w'],
     [[[600,yd,zd],[575,yd,zd],[560,yp,zp],[560,yp,zp-60],[600,-20,90],[660,0,40]],5,.7,'foam','f'],
     [[[447,-20,250],[520,-30,230],[560,yp+20,zp+30],[560,yp,zp]],5,.6,'foam','w']
   ].map(([pts,r,wgt,cond,col])=>{const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1],pts[i][2]-pts[i-1][2]));return {pts,L,len:L[L.length-1],r,cond,col,n:Math.round(wgt*L[L.length-1]/7)}});
@@ -682,9 +698,9 @@ function init3D(){
   function pND(s,a,b,c){
     if(s<.35){const t=s/.35;return polar(700-215*t,8+b*48,a,0,0)}
     if(s<.6){const t=(s-.35)/.25;return polar(452+(c-.5)*14,52+88*t,a-1.6*t,0,0)}
-    const a1=a-1.6;let dl=((a1)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
-    if(s<.88){const t=(s-.6)/.28;return polar(447+(c-.5)*24,150+(b-.5)*10,a1-dl*t,0,0)}
-    const t=(s-.88)/.12;return fc(447+(c-.5)*24,(b-.5)*40,150+t*95)}
+    const a1=a-1.6,aT=1.05;let dl=((a1-aT)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);   // против часовой (вид со входа) до горловины справа сверху
+    if(s<.88){const t=(s-.6)/.28;return polar(447+(c-.5)*24,150+30*t+(b-.5)*10,a1-dl*t,0,0)}
+    const t=(s-.88)/.12;return fc(447+(c-.5)*24,YN+(b-.5)*80,90+t*155)}
   // ступень ВД: вход сверху → колесо 3 → колесо 5 → выход сверху
   function pHP(s,a,b,c){
     if(c<.2){const inl=b<.5,x=(inl?xin:xout)+(a/6.28-.5)*20;const t=inl?s:1-s;return polar(x,155-60*t,0,HPY,HPZ)}
@@ -732,8 +748,10 @@ function init3D(){
       CT.ej=st.foam?1:0;
       for(const k in CT){const tgt=CT[k],spd=/^v/.test(k)?.9:2.5;CA[k]+=Math.max(-spd*dt,Math.min(spd*dt,tgt-CA[k]))}
       for(const P of parts){const c=P.cc;if(!c||!c.k)continue;const a=ease(Math.max(0,Math.min(1,CA[c.k])));
-        P.pivot.position.copy(P.base);if(c.lift)P.pivot.position.x+=c.lift*a;
-        if(c.ax){P.pivot.rotation.set(0,0,0);P.pivot.rotation[c.ax]=(c.turn||c.ang)*a}}
+        P.pivot.position.copy(P.base);
+        if(c.axv){const v=new THREE.Vector3(...c.axv);P.pivot.position.addScaledVector(v,c.lift*a);P.pivot.quaternion.setFromAxisAngle(v,(c.turn||c.ang||0)*a);continue}
+        if(c.lift)P.pivot.position.x+=c.lift*a;
+        if(c.ax){P.pivot.rotation.set(0,0,0);P.pivot.rotation[c.ax]=(c.turn||c.ang)*(c.inv?1-a:a)}}
       const hpOut=on&&CA.kvd>.5, byp=on&&CA.kvd<=.5, outOpen=CA.v1l>.5||CA.v1r>.5||CA.vt>.5||CA.dr>.5||on;
       for(const P of parts)if(/^П 32 /.test(P.name)&&st.hl!==P)P.mat.emissive.set(colors.hp).multiplyScalar(byp?.35+.2*Math.sin(S.t*8):0);
       pts.visible=st.water&&(S.rpm>0||CA.dr>.5)&&explode<.05;
@@ -788,4 +806,12 @@ readColors();
 const h0=(location.hash||'').slice(1);
 setTab(FIG[h0]||h0==='m3'?h0:'nd');
 requestAnimationFrame(loop);
+
+// видео потоков: файлы лежат рядом со страницей (video/), если их нет — берём с сайта
+(function(){const ON='https://yusdyr.github.io/fire-pump-trainer-rus/emulator/video/';const v=document.getElementById('vidEl');
+ function load(n){const local='video/'+n+'.mp4';v.onerror=null;v.src=local;
+   v.onerror=()=>{if(!v.src.startsWith(ON)){v.src=ON+n+'.mp4'}};
+   document.querySelectorAll('[data-vid]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.vid===n))}
+ document.querySelectorAll('[data-vid]').forEach(b=>b.onclick=()=>{load(b.dataset.vid);v.play().catch(()=>{})});
+ load('NCPK_vodoyom')})();
 </script>

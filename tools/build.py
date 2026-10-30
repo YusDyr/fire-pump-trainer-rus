@@ -67,6 +67,8 @@ open(os.path.join(A, 'ustroystvo.html'), 'w', encoding='utf-8').write(ust)
 open(os.path.join(A, 'ustroystvo-v1t.html'), 'w', encoding='utf-8').write(ust1)
 put_fonts(os.path.join(A, 'fonts'))
 shutil.copytree(P('emulator', 'photos'), os.path.join(A, 'photos'))
+if os.path.isdir(P('emulator', 'video')):   # ролики потоков воды (Blender, tools/blender)
+    shutil.copytree(P('emulator', 'video'), os.path.join(A, 'video'))
 
 # версия в манифесте
 m = P('android', 'AndroidManifest.xml')
